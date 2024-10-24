@@ -1,0 +1,29 @@
+<div class="flex flex-col w-full h-full items-center">
+    @if (timeLeft > 0) {
+    <div>Your score is: {{ score }}</div>
+    <div
+        class="grid gap-2.5"
+        [style.gridTemplateColumns]="'repeat(' + columns + ', 50px)'"
+    >
+        @for (square of gridSquares; track $index) {
+        <div
+            [class]="'w-12 h-12 ' + square.color + ' border-2 rounded-md'"
+        ></div>
+        }
+    </div>
+    <div class="mb-4 mt-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="answer">
+            Answer
+        </label>
+        <input
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="answer"
+            type="number"
+            [formControl]="answerInput"
+        />
+    </div>
+    <div class="timer">Time left: {{ timeLeft }} seconds</div>
+    } @else {
+    <div>The game has ended. Your final score is: {{ score }}</div>
+    }
+</div>
