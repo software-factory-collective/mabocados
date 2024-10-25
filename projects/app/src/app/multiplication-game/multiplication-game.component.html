@@ -1,23 +1,29 @@
-<div class="flex flex-col h-screen w-screen justify-center items-center">
-  @if (timeLeft > 0) {
-  <div class="m-4 py-1 px-2 text-4xl rounded-xl bg-gray-900 text-gray-200">{{
-    score.toString().padStart(2,'0') }}</div>
-  <div class="m-4 text-5xl">{{columns}} × {{rows}}</div>
-  <div class="grid gap-2.5" [style.gridTemplateColumns]="'repeat(' + columns + ', 50px)'">
-    @for (square of gridSquares; track $index) {
-    <div [class]="'w-12 h-12 ' + square.color + ' rounded-md'"></div>
+<div class="h-screen w-screen flex justify-center items-center">
+  <div class="max-w-[640px] w-1/2 min-h-[50%] flex flex-col items-center">
+    @if (timeLeft > 0) {
+    <div class="w-full m-4 flex flex-row justify-between items-center">
+      <div class="py-1 px-2 leading-none font-mono text-4xl rounded-xl bg-gray-800 text-gray-100">{{
+        timeLeft.toString().padStart(2,'0')
+        }}</div>
+      <div class="m-4 py-1 px-2 text-4xl rounded-xl bg-green-900 text-gray-200">{{
+        score.toString().padStart(2,'0') }}</div>
+    </div>
+    <div class="m-4 text-5xl">{{columns}} × {{rows}}</div>
+    <div class="grid gap-2.5" [style.gridTemplateColumns]="'repeat(' + columns + ', 50px)'">
+      @for (square of gridSquares; track $index) {
+      <div [class]="'w-12 h-12 ' + square.color + ' rounded-md'"></div>
+      }
+    </div>
+    <form [formGroup]="answerForm" class="mb-4 mt-4" (ngSubmit)="checkAnswer()">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="answer">
+        Answer
+      </label>
+      <input
+        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        id="answer" type="number" formControlName="product" autofocus />
+    </form>
+    } @else {
+    <div>The game has ended. Your final score is: {{ score }}</div>
     }
   </div>
-  <form [formGroup]="answerForm" class="mb-4 mt-4" (ngSubmit)="checkAnswer()">
-    <label class="block text-gray-700 text-sm font-bold mb-2" for="answer">
-      Answer
-    </label>
-    <input
-      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-      id="answer" type="number" formControlName="product" autofocus />
-  </form>
-  <div>Time left: {{ timeLeft }} seconds</div>
-  } @else {
-  <div>The game has ended. Your final score is: {{ score }}</div>
-  }
 </div>
