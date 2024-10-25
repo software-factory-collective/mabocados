@@ -6,7 +6,6 @@ import {
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { interval, Subscription } from 'rxjs';
 
 type Square = {
@@ -21,9 +20,6 @@ type Square = {
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        RouterOutlet,
-        RouterLink,
-        RouterLinkActive,
     ],
 })
 export class MultiplicationGameComponent implements OnInit {
@@ -54,8 +50,8 @@ export class MultiplicationGameComponent implements OnInit {
     }
 
     generateGrid() {
-        this.rows = this.getRandomInt(3, 6);
-        this.columns = this.getRandomInt(3, 6);
+        this.rows = this.getRandomInt(3, 9);
+        this.columns = this.getRandomInt(3, 9);
         const totalSquares = this.rows * this.columns;
         this.gridSquares = Array(totalSquares).fill({
             color: 'bg-[lightgray]',
