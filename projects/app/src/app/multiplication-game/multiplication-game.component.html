@@ -1,6 +1,8 @@
 <div class="flex flex-col h-screen w-screen justify-center items-center">
   @if (timeLeft > 0) {
-  <div class="mb-4 mt-4">Your score is: {{ score }}</div>
+  <div class="m-4 py-1 px-2 text-4xl rounded-xl bg-gray-900 text-gray-200">{{
+    score.toString().padStart(2,'0') }}</div>
+  <div class="m-4 text-5xl">{{columns}} × {{rows}}</div>
   <div class="grid gap-2.5" [style.gridTemplateColumns]="'repeat(' + columns + ', 50px)'">
     @for (square of gridSquares; track $index) {
     <div [class]="'w-12 h-12 ' + square.color + ' rounded-md'"></div>
