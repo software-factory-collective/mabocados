@@ -1,8 +1,0 @@
-
-services:
-  mabocados-app:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    ports:
-      - 3502:80

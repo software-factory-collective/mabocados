@@ -1,0 +1,13 @@
+services:
+  mabocados-site:
+    build:
+      context: projects/site
+      dockerfile: ./Dockerfile
+    ports:
+      - 3501:80
+  mabocados-app:
+    build:
+      context: projects/app
+      dockerfile: ./Dockerfile
+    ports:
+      - 3502:80
