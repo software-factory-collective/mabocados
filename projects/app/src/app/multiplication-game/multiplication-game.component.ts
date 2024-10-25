@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import {
+    FormBuilder,
     FormControl,
+    FormGroup,
     FormsModule,
     ReactiveFormsModule,
     Validators,
@@ -23,8 +25,11 @@ type Square = {
     ],
 })
 export class MultiplicationGameComponent implements OnInit {
+    
     gridSquares: Square[] = [];
-    answerInput = new FormControl(0, [Validators.required]);
+    answerForm = new FormGroup({
+        product: new FormControl(null)
+    })
     isCorrect: boolean = false;
     isOverflow: boolean = false;
     timeLeft: number = 60;
@@ -35,9 +40,6 @@ export class MultiplicationGameComponent implements OnInit {
 
     ngOnInit() {
         this.startGame();
-        this.answerInput.valueChanges.subscribe(() => {
-            this.checkAnswer();
-        });
     }
 
     startGame() {
@@ -59,7 +61,8 @@ export class MultiplicationGameComponent implements OnInit {
     }
 
     checkAnswer() {
-        const userAnswer = this.answerInput?.value ?? 0;
+        const userAnswer = this.answerForm.value.product ?? 0;
+        this.answerForm.setValue({product: null}); 
         const correctAnswer = this.rows * this.columns;
         if (userAnswer < correctAnswer) {
             const remainingSquares = correctAnswer - userAnswer;
