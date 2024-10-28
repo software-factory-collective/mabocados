@@ -1,9 +1,0 @@
-
-services:
-  mabocados:
-    image: mabocados
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    ports:
-      - 3501:80
