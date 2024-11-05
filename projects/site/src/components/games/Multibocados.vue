@@ -11,9 +11,9 @@ const start = () => {
 </script>
 
 <template>
-  <main class="flex flex-col items-center m-4">
-  <h1 class="text-xl">Multibocados</h1>
-
+  <main class="flex flex-col items-center gap-4 m-4">
+  <h1 class="text-4xl">Multibocados</h1>
+  <div class="text-xl">Level {{level}}</div>
     <button type="button" @click="start()">Start</button>
 
   </main>
