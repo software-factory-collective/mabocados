@@ -1,0 +1,108 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CardDev from "../../components/card-developer/index.astro";
+---
+
+<Layout title="About Us - Mabocados">
+  <section>
+    <main>
+      <h1 class="title">About Mabocados</h1>
+      <p>
+        Mabocados is an application designed to exercise the mind through mini
+        mathematical games. Its objective is to facilitate the learning of new
+        math and logic concepts, complementing education and keeping the brain
+        active and fit.
+      </p>
+      <p>
+        With Mabocados, learning is dynamic and entertaining, encouraging users
+        to strengthen their cognitive skills in a fun and continuous way.
+      </p>
+      <span class="alpha-notice"
+        >Mabocados is still in alpha and will be released soon!</span
+      >
+      <div>
+        <h2 class="title">Developement team</h2>
+        <ul class="container">
+          <CardDev
+            name="Addison Emig"
+            role="Developer"
+            description="Short description of the developer"
+            githubUsername="Pertempto"
+          />
+          <CardDev
+            name="Leandro Méndez"
+            role="Developer"
+            description="Software developer, experienced teaching high school math."
+            githubUsername="LeanMendez"
+          />
+          <CardDev
+            name="Julián Campana"
+            role="Developer"
+            description="Short description of the developer"
+            githubUsername="JCampana98"
+          />
+        </ul>
+      </div>
+    </main>
+  </section>
+
+  <style>
+    main {
+      margin: auto;
+      padding: 1rem;
+      width: 800px;
+      max-width: calc(100% - 2rem);
+      color: white;
+      font-size: 20px;
+      line-height: 1.6;
+    }
+
+    .title {
+      font-size: 2.75rem;
+      font-weight: 700;
+      margin: 2rem 0;
+      background: linear-gradient(90deg, #8acf5f, #38bf6a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .alpha-notice {
+      display: flex;
+      max-width: 800px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: 4px solid rgba(191, 234, 51, 0.5); /* Color morado semitransparente */
+      border-radius: 2px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .alpha-notice:hover {
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    ul {
+      display: grid;
+      grid-column: auto;
+      flex-direction: column;
+      margin: 0;
+      padding: 0;
+      gap: 1.5rem;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 1fr;
+      grid-column-gap: 15px;
+      grid-row-gap: 0px;
+    }
+  </style>
+</Layout>
