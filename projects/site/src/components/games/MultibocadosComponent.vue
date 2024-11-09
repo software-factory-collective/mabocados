@@ -21,7 +21,7 @@ function start() {
   generateGrid();
 }
 
-function getRandomInt(oldValue, min, max) {
+function getRandomInt(oldValue: number, min: number, max: number) {
   let newValue = oldValue;
   while (newValue == oldValue) {
     newValue = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -69,26 +69,22 @@ function checkAnswer() {
     <!-- <div class="text-xl">Level {{ level }}</div> -->
     <template v-if="isStarted">
       <div
-        class="game-field max-w-[640px] w-1/2 min-h-[50%] flex flex-col items-center"
+        class="game-field flex flex-col items-center"
         :class="showError ? 'error' : ''"
       >
         <template v-if="timeLeft > 0">
           <div class="w-full m-4 flex flex-row justify-between items-center">
-            <div
-              class="m-4 py-1 px-2 leading-none font-mono text-4xl rounded-xl bg-gray-800 text-gray-100"
-            >
+            <div class="number-box">
               {{ timeLeft.toString().padStart(2, "0") }}
             </div>
-            <div
-              class="m-4 py-1 px-2 text-4xl rounded-xl bg-green-900 text-gray-200"
-            >
+            <div class="number-box">
               {{ score.toString().padStart(2, "0") }}
             </div>
           </div>
           <!-- <div class="m-4 text-5xl">{{ columns }} × {{ rows }}</div> -->
           <div
-            class="grid gap-2.5"
-            :style="{ gridTemplateColumns: 'repeat(' + columns + ', 50px)' }"
+            class="grid gap-2"
+            :style="{ gridTemplateColumns: 'repeat(' + columns + ', 1fr)' }"
           >
             <div
               v-for="(square, index) in gridSquares"
@@ -110,10 +106,15 @@ function checkAnswer() {
             />
           </form>
         </template>
-        <div v-else>The game has ended. Your final score is: {{ score }}</div>
+        <template v-else>
+          <div class="number-box">
+            {{ score }}
+          </div>
+          <button type="button" @click="start()" autofocus>Restart</button>
+        </template>
       </div>
     </template>
-    <button v-else type="button" @click="start()">Start</button>
+    <button v-else type="button" @click="start()" autofocus>Start</button>
   </main>
 </template>
 
@@ -139,6 +140,11 @@ input {
 }
 
 .game-field {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50vw;
+  min-height: 50vh;
   padding: 16px;
   background: #333;
   border-radius: 24px;
@@ -148,9 +154,20 @@ input {
     border: 8px red solid;
   }
 }
+
+.number-box {
+  margin: 16px;
+  padding: 4px 16px;
+  font-size: 2rem;
+  font-family: mono;
+  border-radius: 16px;
+  background: #444;
+  color: #aaa;
+}
+
 .sq {
-  width: 48px;
-  height: 48px;
+  width: 5vw;
+  height: 5vw;
   background: gray;
   border-radius: 8px;
 
