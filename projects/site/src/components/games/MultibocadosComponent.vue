@@ -156,16 +156,58 @@ input {
 
   &.g {
     background: green;
+
+    animation: shrink 0.77s linear infinite;
   }
 
   &.b {
     background: blue;
-    border-radius: 12px;
+    border-radius: 2px;
+
+    animation: jiggle 0.4s ease-in-out infinite;
   }
 
   &.r {
     background: red;
     border-radius: 24px;
+
+    animation: bounce 0.34s ease-in-out infinite;
+  }
+}
+@keyframes jiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+@keyframes bounce {
+  0% {
+    transform: translate(0);
+  }
+  50% {
+    transform: translate(0, -3px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+@keyframes shrink {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 </style>
