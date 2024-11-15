@@ -6,8 +6,8 @@ defineProps<{ level: string }>();
 const isStarted = ref(false);
 const timeLeft = ref(0);
 const score = ref(0);
-const columns = ref(0);
-const rows = ref(0);
+const width = ref(0);
+const height = ref(0);
 const gridSquares = ref<string[]>([]);
 const answer = ref(null);
 const showError = ref(false);
@@ -34,21 +34,31 @@ function getRandomInt(oldValue: number, min: number, max: number) {
   return newValue;
 }
 
+// TODO: put the grid pattern logic into a unit-testable function
+// TODO: improve the algorithm to make the patterns as helpful as possible
 function generateGrid() {
-  rows.value = getRandomInt(rows.value, 3, 9);
-  columns.value = getRandomInt(columns.value, 3, 9);
-  const totalSquares = rows.value * columns.value;
+  height.value = getRandomInt(height.value, 3, 9);
+  width.value = getRandomInt(width.value, 3, 9);
+  const totalSquares = height.value * width.value;
   gridSquares.value = Array(totalSquares).fill("");
 
-  const repeats = { g: 3, b: 5, r: 7 };
+  const options = ["r", "g", "b"];
+  let xFactor = Math.floor(width.value / options.length);
+  if (width.value < 6) {
+    xFactor = options.length;
+  }
+  let yFactor = Math.floor(height.value / options.length);
+  if (height.value < 6) {
+    yFactor = options.length;
+  }
 
-  for (let x = 0; x < columns.value; x++) {
-    for (let y = 0; y < rows.value; y++) {
-      for (const [key, modulo] of Object.entries(repeats)) {
-        if ((x + 1) % modulo == 0 || (y + 1) % modulo == 0) {
-          gridSquares.value[y * columns.value + x] = key;
-        }
-      }
+  for (let x = 0; x < width.value; x++) {
+    for (let y = 0; y < height.value; y++) {
+      // Make the cool pattern
+      // TODO: describe in more detail what is going on here
+      const index =
+        (Math.floor(x / xFactor) + Math.floor(y / yFactor)) % options.length;
+      gridSquares.value[y * width.value + x] = options[index];
     }
   }
   console.log(Array.from(gridSquares.value));
@@ -56,7 +66,7 @@ function generateGrid() {
 
 function checkAnswer() {
   showError.value = false;
-  const isCorrect = answer.value == columns.value * rows.value;
+  const isCorrect = answer.value == width.value * height.value;
   console.log("is correct:", isCorrect);
   if (isCorrect) {
     score.value++;
@@ -86,10 +96,10 @@ function checkAnswer() {
               {{ score.toString().padStart(2, "0") }}
             </div>
           </div>
-          <div class="m-4 text-5xl">{{ columns }} × {{ rows }}</div>
+          <div class="m-4 text-5xl">{{ width }} × {{ height }}</div>
           <div
             class="grid gap-2"
-            :style="{ gridTemplateColumns: 'repeat(' + columns + ', 1fr)' }"
+            :style="{ gridTemplateColumns: 'repeat(' + width + ', 1fr)' }"
           >
             <div
               v-for="(square, index) in gridSquares"
@@ -171,29 +181,29 @@ input {
 }
 
 .sq {
-  width: 5vw;
-  height: 5vw;
+  width: 3vw;
+  height: 3vw;
   background: gray;
   border-radius: 8px;
 
   &.g {
     background: green;
 
-    animation: shrink 0.77s linear infinite;
+    /* animation: shrink 0.77s linear infinite;*/
   }
 
   &.b {
     background: blue;
     border-radius: 2px;
 
-    animation: jiggle 0.4s ease-in-out infinite;
+    /* animation: jiggle 0.4s ease-in-out infinite;*/
   }
 
   &.r {
     background: red;
     border-radius: 24px;
 
-    animation: bounce 0.34s ease-in-out infinite;
+    /* animation: bounce 0.34s ease-in-out infinite;*/
   }
 }
 @keyframes jiggle {
