@@ -45,11 +45,11 @@ function generateGrid() {
   const options = ["r", "g", "b"];
   let xFactor = Math.floor(width.value / options.length);
   if (width.value < 6) {
-    xFactor = options.length;
+    xFactor = width.value;
   }
   let yFactor = Math.floor(height.value / options.length);
   if (height.value < 6) {
-    yFactor = options.length;
+    yFactor = height.value;
   }
 
   for (let x = 0; x < width.value; x++) {
