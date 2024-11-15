@@ -11,11 +11,16 @@ const rows = ref(0);
 const gridSquares = ref<string[]>([]);
 const answer = ref(null);
 const showError = ref(false);
+const interval = ref<number | undefined>(undefined);
 
 function start() {
   isStarted.value = true;
   timeLeft.value = 60;
-  setInterval(() => {
+  gridSquares.value = [];
+
+  // TODO: is there a better way to handle the timer in vue??
+  clearInterval(interval.value);
+  interval.value = setInterval(() => {
     timeLeft.value -= 1;
   }, 1000);
   generateGrid();
@@ -81,7 +86,7 @@ function checkAnswer() {
               {{ score.toString().padStart(2, "0") }}
             </div>
           </div>
-          <!-- <div class="m-4 text-5xl">{{ columns }} × {{ rows }}</div> -->
+          <div class="m-4 text-5xl">{{ columns }} × {{ rows }}</div>
           <div
             class="grid gap-2"
             :style="{ gridTemplateColumns: 'repeat(' + columns + ', 1fr)' }"
