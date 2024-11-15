@@ -16,120 +16,203 @@ const avatarUrl = `https://github.com/${githubUsername}.png`;
     <div class="avatar-container">
       <img src={avatarUrl} alt={`${name}'s avatar`} class="avatar" />
     </div>
-    <h3 class="title">{name}</h3>
-    <p class="role">{role}</p>
-    <p class="description">{description}</p>
-    <a href={githubUrl} target="_blank" rel="noopener noreferrer" class="github-link">
+    <div class="text-container">
+      <h3 class="title">{name}</h3>
+      <p class="role">{role}</p>
+      <p class="description">{description}</p>
+      <a href={githubUrl} target="_blank" rel="noopener noreferrer" class="github-link">
       <svg class="github-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
       </svg>
       GitHub
     </a>
+    </div>
   </div>
 </div>
 
 <style>
+.dev-card {
+  width: 210px;
+  background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+  border-radius: 20px;
+  padding: 1.5rem;
+  color: #fff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dev-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, rgba(66, 133, 244, 0.1), rgba(20, 168, 129, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dev-card:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.dev-card:hover::before {
+  opacity: 1;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.avatar-container {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  background: linear-gradient(90deg, #8acf5f, #38bf6a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.role {
+  font-size: 1rem;
+  color: #a0a0a0;
+  margin: 0;
+  text-align: center;
+}
+
+.description {
+  height: 3.75rem;
+  font-size: 0.875rem;
+  color: #d0d0d0;
+  text-align: center;
+  margin: 0;
+  line-height: 1.375;
+  text-wrap: balance;
+}
+
+.github-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1.5rem;
+  margin-top: 0.75rem;
+  background: linear-gradient(90deg, #70af48, #38bf6a);
+  border-radius: 25px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: box-shadow 0.3s ease;
+}
+
+.github-link:hover {
+  box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+}
+
+.github-icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+@media (max-width: 950px) {
   .dev-card {
-    width: 230px;
-    background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
-    border-radius: 20px;
-    padding: 1.5rem;
-    color: #fff;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .dev-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(145deg, rgba(66, 133, 244, 0.1), rgba(20, 168, 129, 0.1));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .dev-card:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-  }
-
-  .dev-card:hover::before {
-    opacity: 1;
+    display: flex;
+    align-items: center;
+    width: 305px;
+    height: 220px;
   }
 
   .card-content {
-    position: relative;
-    z-index: 1;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: start;
   }
 
   .avatar-container {
-    width: 120px;
-    height: 120px;
-    border-radius: 60px;
-    overflow: hidden;
-    border: 4px solid rgba(255, 255, 255, 0.1);
-    transition: transform 0.3s ease;
+    min-width: 110px;
+    width: 110px;
+    height: 110px;
   }
 
+  .text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.5rem;
+  }
 
-  .avatar {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  .title {
+    font-size: 1.25rem;
+    text-align: left;
+  }
+
+  .description {
+    text-align: left;
+  }
+}
+
+@media (max-width: 750px) {
+  .dev-card {
+    display: flex;
+    align-items: center;
+    width: 210px;
+    height: inherit;
+  }
+
+  .card-content {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .avatar-container {
+    min-width: 110px;
+    width: 110px;
+    height: 110px;
+  }
+
+  .text-container {
+    align-items: center;
   }
 
   .title {
     font-size: 1.5rem;
-    font-weight: 500;
-    margin: 0;
-    background: linear-gradient(90deg, #8acf5f, #38bf6a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .role {
-    font-size: 1rem;
-    color: #a0a0a0;
-    margin: 0;
     text-align: center;
   }
 
   .description {
-    font-size: 0.9rem;
-    color: #d0d0d0;
     text-align: center;
-    margin: 0;
-    line-height: 1.5;
   }
-
-  .github-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: linear-gradient(90deg, #70af48, #38bf6a);
-    border-radius: 25px;
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-  }
-
-  .github-link:hover {
-    box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
-  }
-
-  .github-icon {
-    width: 20px;
-    height: 20px;
-    fill: currentColor;
-  }
+}
 </style>
