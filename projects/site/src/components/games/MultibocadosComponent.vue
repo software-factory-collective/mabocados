@@ -66,9 +66,6 @@ function generateGrid() {
   console.log(Array.from(gridSquares.value));
 }
 
-function handleKey(key) {
-  console.log(key);
-}
 function handleKeyboardButton(value: number) {
   answer.value = answer.value * 10 + value;
   if (answer.value.toString().length == correctAnswer.value.toString().length) {
@@ -91,7 +88,7 @@ function checkAnswer() {
 </script>
 
 <template>
-  <main tabindex="0" @keyup="handleKey">
+  <main>
     <div id="game-field" :class="showError ? 'error' : ''">
       <template v-if="isStarted && timeLeft > 0">
         <div id="status-row">
@@ -177,14 +174,15 @@ input {
   border-radius: 24px;
   container-type: size;
   transition: all 50ms;
+  &.error {
+    /* TODO: make this better for color blind */
+    border-color: red;
+    #answer {
+      background-color: red;
+    }
+  }
 }
-#game-field.error {
-  /* TODO: make this better for color blind */
-  border-color: red;
-}
-#game-field.error #answer {
-  background-color: red;
-}
+
 @media screen and (orientation: portrait) {
   #game-field {
     margin: auto 16px;
@@ -211,11 +209,13 @@ input {
   flex-direction: row;
   justify-content: center;
   container-type: size;
+
+  span {
+    font-size: 80cqh;
+    line-height: 1;
+  }
 }
-#factors span {
-  font-size: 80cqh;
-  line-height: 1;
-}
+
 #grid {
   container-type: size;
   display: grid;
@@ -232,11 +232,12 @@ input {
   background: #222;
   border-radius: 32px;
   container-type: size;
-}
-#answer span {
-  font-family: mono;
-  font-size: 80cqh;
-  line-height: 1;
+
+  span {
+    font-family: mono;
+    font-size: 80cqh;
+    line-height: 1;
+  }
 }
 #keyboard {
   flex: 2;
@@ -244,14 +245,14 @@ input {
   grid-template-columns: repeat(5, 1fr);
 
   container-type: size;
-}
-#keybord button {
-  background: transparent;
-  font-size: 20cqh;
-  line-height: 1;
-}
-#keyboard button:active {
-  background: #88888888;
+  button {
+    background: transparent;
+    font-size: 20cqh;
+    line-height: 1;
+    &:active {
+      background: #88888888;
+    }
+  }
 }
 .large-box {
   aspect-ratio: 1;
