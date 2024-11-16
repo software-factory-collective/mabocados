@@ -89,52 +89,54 @@ function checkAnswer() {
 
 <template>
   <main>
-    <div id="game-field" :class="showError ? 'error' : ''">
-      <template v-if="isStarted && timeLeft > 0">
-        <div id="status-row">
-          <div class="number-box">
-            {{ timeLeft.toString().padStart(2, "0") }}
+    <div id="game-field-container">
+      <div id="game-field" :class="showError ? 'error' : ''">
+        <template v-if="isStarted && timeLeft > 0">
+          <div id="status-row">
+            <div class="number-box">
+              {{ timeLeft.toString().padStart(2, "0") }}
+            </div>
+            <div class="number-box">
+              {{ score.toString().padStart(2, "0") }}
+            </div>
           </div>
-          <div class="number-box">
-            {{ score.toString().padStart(2, "0") }}
+          <div id="factors">
+            <span>{{ width }} × {{ height }}</span>
           </div>
-        </div>
-        <div id="factors">
-          <span>{{ width }} × {{ height }}</span>
-        </div>
-        <div
-          id="grid"
-          class="large-box"
-          :style="{ gridTemplateColumns: 'repeat(' + width + ', 1fr)' }"
-        >
           <div
-            v-for="(square, index) in gridSquares"
-            :key="index"
-            :class="'sq ' + square"
-          ></div>
-        </div>
-        <div id="answer">
-          <span>{{ answer }}</span>
-        </div>
-        <div id="keyboard">
-          <button
-            v-for="value in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]"
-            :key="value"
-            @click="handleKeyboardButton(value)"
+            id="grid"
+            class="large-box"
+            :style="{ gridTemplateColumns: 'repeat(' + width + ', 1fr)' }"
           >
-            {{ value }}
-          </button>
-        </div>
-      </template>
-      <button v-else-if="!isStarted" type="button" @click="start()" autofocus>
-        Start
-      </button>
-      <template v-else>
-        <div class="large-box">
-          {{ score }}
-        </div>
-        <button type="button" @click="start()" autofocus>Restart</button>
-      </template>
+            <div
+              v-for="(square, index) in gridSquares"
+              :key="index"
+              :class="'sq ' + square"
+            ></div>
+          </div>
+          <div id="answer">
+            <span>{{ answer }}</span>
+          </div>
+          <div id="keyboard">
+            <button
+              v-for="value in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]"
+              :key="value"
+              @click="handleKeyboardButton(value)"
+            >
+              {{ value }}
+            </button>
+          </div>
+        </template>
+        <button v-else-if="!isStarted" type="button" @click="start()" autofocus>
+          Start
+        </button>
+        <template v-else>
+          <div class="large-box">
+            {{ score }}
+          </div>
+          <button type="button" @click="start()" autofocus>Restart</button>
+        </template>
+      </div>
     </div>
   </main>
 </template>
@@ -148,6 +150,7 @@ main {
   align-items: center;
   justify-content: center;
   padding: 16px;
+  overflow: clip;
 }
 button {
   background: gray;
@@ -159,9 +162,15 @@ input {
   color: white;
   border: 1px white solid;
 }
-
+#game-field-container {
+  min-width: 100%;
+  max-width: 100%;
+  min-height: 0%;
+  max-height: 100%;
+}
 #game-field {
   flex-grow: 1;
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -184,13 +193,20 @@ input {
 }
 
 @media screen and (orientation: portrait) {
+  #game-field-container {
+    min-width: 100%;
+    min-height: 0%;
+  }
   #game-field {
-    margin: auto 16px;
+    margin: auto 0;
   }
 }
 @media screen and (orientation: landscape) {
+  #game-field-container {
+    min-height: 100%;
+  }
   #game-field {
-    margin: 16px auto;
+    margin: 0 auto;
   }
 }
 
@@ -210,7 +226,7 @@ input {
   justify-content: center;
   container-type: size;
 
-  span {
+  > span {
     font-size: 80cqh;
     line-height: 1;
   }
@@ -233,7 +249,7 @@ input {
   border-radius: 32px;
   container-type: size;
 
-  span {
+  > span {
     font-family: mono;
     font-size: 80cqh;
     line-height: 1;
@@ -245,7 +261,8 @@ input {
   grid-template-columns: repeat(5, 1fr);
 
   container-type: size;
-  button {
+
+  > button {
     background: transparent;
     font-size: 20cqh;
     line-height: 1;
