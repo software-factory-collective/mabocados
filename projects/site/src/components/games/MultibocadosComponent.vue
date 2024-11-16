@@ -33,6 +33,7 @@ function start() {
     timeLeft.value -= 1;
     if (timeLeft.value <= 0) {
       clearInterval(countDownInterval);
+      clearTimeout(interactionTimeout);
     }
   }, 1000);
   nextProblem();
@@ -53,10 +54,11 @@ function nextProblem() {
   width.value = getRandomInt(width.value, 1, level);
   gridSquares.value = generateGrid(width.value, height.value, ["r", "g", "b"]);
 
+  clearTimeout(interactionTimeout);
   showInteractionHint.value = false;
   interactionTimeout = setTimeout(() => {
     showInteractionHint.value = true;
-  }, 3000);
+  }, 10000);
 }
 
 // TODO: move this to a separate file
@@ -90,13 +92,15 @@ function generateGrid(
 
 function handleKeyboardButton(value: number) {
   clearTimeout(interactionTimeout);
+  showInteractionHint.value = false;
   answer.value = answer.value * 10 + value;
   if (answer.value.toString().length == correctAnswer.value.toString().length) {
     checkAnswer();
+  } else {
+    // If the user doesn't hit a button within 5 seconds, they must be confused
+    // and think that the answer has less digits than it does. Show an error
+    interactionTimeout = setTimeout(checkAnswer, 5000);
   }
-  // If the user doesn't hit a button within 5 seconds, they must be confused
-  // and think that the answer has less digits than it does. Show an error
-  interactionTimeout = setTimeout(checkAnswer, 5000);
 }
 function checkAnswer() {
   showError.value = false;
@@ -106,7 +110,7 @@ function checkAnswer() {
     nextProblem();
   } else {
     showError.value = true;
-    // TODO: display hint
+    // TODO: display answer hint
   }
   answer.value = 0;
 }
@@ -119,10 +123,10 @@ function checkAnswer() {
         <template v-if="isStarted && timeLeft > 0">
           <div id="status-row">
             <div class="number-box">
-              {{ timeLeft.toString().padStart(2, "0") }}
+              ⏱ {{ timeLeft.toString().padStart(2, "0") }}
             </div>
             <div class="number-box">
-              {{ score.toString().padStart(2, "0") }}
+              🥑 {{ score.toString().padStart(2, "0") }}
             </div>
           </div>
           <div id="factors">
@@ -157,10 +161,8 @@ function checkAnswer() {
           <button type="button" @click="start()" autofocus>▶️</button>
         </template>
         <template v-else>
-          <div class="large-box">
-            {{ score }}
-          </div>
-          <button type="button" @click="start()" autofocus>Restart</button>
+          <div class="large-box">🥑 {{ score }}</div>
+          <button type="button" @click="start()" autofocus>🔄</button>
         </template>
       </div>
     </div>
@@ -210,7 +212,6 @@ input {
   container-type: size;
   transition: all 50ms;
   &.interaction-hint button {
-    outline: 1px solid transparent;
     animation: outline-fade 2s infinite;
   }
   &.error {
