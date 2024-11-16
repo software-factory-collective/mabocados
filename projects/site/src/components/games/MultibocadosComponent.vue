@@ -2,7 +2,7 @@
 import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 
-const { level = 10 } = defineProps<{ level: number }>();
+const { level = 10 } = defineProps<{ level?: number }>();
 
 const isStarted = ref(false);
 const timeLeft = ref(0);
