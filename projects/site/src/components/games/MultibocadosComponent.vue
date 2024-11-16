@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 
 defineProps<{ level: string }>();
@@ -8,8 +9,9 @@ const timeLeft = ref(0);
 const score = ref(0);
 const width = ref(0);
 const height = ref(0);
+const correctAnswer = computed(() => width.value * height.value);
 const gridSquares = ref<string[]>([]);
-const answer = ref(null);
+const answer = ref(0);
 const showError = ref(false);
 const interval = ref<number | undefined>(undefined);
 
@@ -64,17 +66,24 @@ function generateGrid() {
   console.log(Array.from(gridSquares.value));
 }
 
+function handleKeyboardButton(value: number) {
+  answer.value = answer.value * 10 + value;
+  if (answer.value.toString().length == correctAnswer.value.toString().length) {
+    checkAnswer();
+  }
+  // TODO: set a 5 second timer, check answer if user doesn't input another value
+  // so they don't get confused of why there is no submit button
+}
 function checkAnswer() {
   showError.value = false;
-  const isCorrect = answer.value == width.value * height.value;
-  console.log("is correct:", isCorrect);
+  const isCorrect = answer.value == correctAnswer.value;
   if (isCorrect) {
     score.value++;
     generateGrid();
   } else {
     showError.value = true;
   }
-  answer.value = null;
+  answer.value = 0;
 }
 </script>
 
@@ -93,6 +102,7 @@ function checkAnswer() {
         <div id="factors" class="text-5xl">{{ width }} × {{ height }}</div>
         <div
           id="grid"
+          class="large-box"
           :style="{ gridTemplateColumns: 'repeat(' + width + ', 1fr)' }"
         >
           <div
@@ -101,20 +111,18 @@ function checkAnswer() {
             :class="'sq ' + square"
           ></div>
         </div>
-        <form
-          id="answers"
-          @submit.prevent="checkAnswer"
-          class="mb-4 mt-4"
-          autocomplete="off"
-        >
-          <input
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="answer"
-            type="number"
-            v-model="answer"
-            autofocus
-          />
-        </form>
+        <div id="answer">
+          <span>{{ answer }}</span>
+        </div>
+        <div id="keyboard">
+          <button
+            v-for="value in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]"
+            :key="value"
+            @click="handleKeyboardButton(value)"
+          >
+            {{ value }}
+          </button>
+        </div>
       </template>
       <button v-else-if="!isStarted" type="button" @click="start()" autofocus>
         Start
@@ -162,10 +170,14 @@ input {
   background: #333;
   border: 8px #222 solid;
   border-radius: 24px;
+  container-type: size;
   transition: all 50ms;
   &.error {
     /* TODO: make this better for color blind */
     border-color: red;
+    #answer {
+      background-color: red;
+    }
   }
 }
 
@@ -184,22 +196,54 @@ input {
   flex: 1;
   display: flex;
   flex-direction: row;
+  align-items: start;
   justify-content: space-between;
 }
 
 #factors {
   flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 
 #grid {
-  flex: 4;
   container-type: size;
   display: grid;
   gap: 4px;
+  align-items: stretch;
+  background: transparent;
 }
 
 #answer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #222;
+  border-radius: 32px;
+  container-type: size;
+
+  span {
+    font-family: mono;
+    font-size: 80cqh;
+    line-height: 1;
+  }
+}
+#keyboard {
   flex: 2;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+
+  container-type: size;
+  button {
+    background: transparent;
+    font-size: 20cqh;
+    line-height: 1;
+    &:active {
+      background: #88888888;
+    }
+  }
 }
 .large-box {
   aspect-ratio: 1;
@@ -211,7 +255,6 @@ input {
   font-size: 10vh;
 }
 .number-box {
-  margin: 16px;
   padding: 4px 16px;
   font-size: 2rem;
   font-family: mono;
