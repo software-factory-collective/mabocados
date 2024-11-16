@@ -80,56 +80,54 @@ function checkAnswer() {
 
 <template>
   <main>
-    <h1 class="text-4xl">Multibocados</h1>
-    <!-- <div class="text-xl">Level {{ level }}</div> -->
-    <template v-if="isStarted">
-      <div
-        class="game-field flex flex-col items-center"
-        :class="showError ? 'error' : ''"
-      >
-        <template v-if="timeLeft > 0">
-          <div class="w-full m-4 flex flex-row justify-between items-center">
-            <div class="number-box">
-              {{ timeLeft.toString().padStart(2, "0") }}
-            </div>
-            <div class="number-box">
-              {{ score.toString().padStart(2, "0") }}
-            </div>
-          </div>
-          <div class="m-4 text-5xl">{{ width }} × {{ height }}</div>
-          <div
-            class="grid gap-2"
-            :style="{ gridTemplateColumns: 'repeat(' + width + ', 1fr)' }"
-          >
-            <div
-              v-for="(square, index) in gridSquares"
-              :key="index"
-              :class="'sq ' + square"
-            ></div>
-          </div>
-          <form
-            @submit.prevent="checkAnswer"
-            class="mb-4 mt-4"
-            autocomplete="off"
-          >
-            <input
-              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="answer"
-              type="number"
-              v-model="answer"
-              autofocus
-            />
-          </form>
-        </template>
-        <template v-else>
+    <div
+      class="game-field flex flex-col items-center"
+      :class="showError ? 'error' : ''"
+    >
+      <template v-if="isStarted && timeLeft > 0">
+        <div class="w-full m-4 flex flex-row justify-between items-center">
           <div class="number-box">
-            {{ score }}
+            {{ timeLeft.toString().padStart(2, "0") }}
           </div>
-          <button type="button" @click="start()" autofocus>Restart</button>
-        </template>
-      </div>
-    </template>
-    <button v-else type="button" @click="start()" autofocus>Start</button>
+          <div class="number-box">
+            {{ score.toString().padStart(2, "0") }}
+          </div>
+        </div>
+        <div class="m-4 text-5xl">{{ width }} × {{ height }}</div>
+        <div
+          class="grid gap-2"
+          :style="{ gridTemplateColumns: 'repeat(' + width + ', 1fr)' }"
+        >
+          <div
+            v-for="(square, index) in gridSquares"
+            :key="index"
+            :class="'sq ' + square"
+          ></div>
+        </div>
+        <form
+          @submit.prevent="checkAnswer"
+          class="mb-4 mt-4"
+          autocomplete="off"
+        >
+          <input
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="answer"
+            type="number"
+            v-model="answer"
+            autofocus
+          />
+        </form>
+      </template>
+      <button v-else-if="!isStarted" type="button" @click="start()" autofocus>
+        Start
+      </button>
+      <template v-else>
+        <div class="number-box">
+          {{ score }}
+        </div>
+        <button type="button" @click="start()" autofocus>Restart</button>
+      </template>
+    </div>
   </main>
 </template>
 
@@ -155,21 +153,33 @@ input {
 }
 
 .game-field {
+  flex-grow: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-width: 50vw;
-  min-height: 50vh;
+  justify-content: stretch;
+  aspect-ratio: 9/16;
   padding: 16px;
   background: #333;
+  border: 8px #222 solid;
   border-radius: 24px;
   transition: all 50ms;
-
   &.error {
-    border: 8px red solid;
+    /* TODO: make this better for color blind */
+    border-color: red;
   }
 }
 
+@media screen and (orientation: portrait) {
+  .game-field {
+    margin: auto 16px;
+  }
+}
+@media screen and (orientation: landscape) {
+  .game-field {
+    margin: 16px auto;
+  }
+}
 .number-box {
   margin: 16px;
   padding: 4px 16px;
@@ -181,65 +191,23 @@ input {
 }
 
 .sq {
-  width: 3vw;
-  height: 3vw;
+  width: 3%;
+  height: 3%;
   background: gray;
   border-radius: 8px;
 
   &.g {
     background: green;
-
-    /* animation: shrink 0.77s linear infinite;*/
   }
 
   &.b {
     background: blue;
     border-radius: 2px;
-
-    /* animation: jiggle 0.4s ease-in-out infinite;*/
   }
 
   &.r {
     background: red;
     border-radius: 24px;
-
-    /* animation: bounce 0.34s ease-in-out infinite;*/
-  }
-}
-@keyframes jiggle {
-  0% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(5deg);
-  }
-  75% {
-    transform: rotate(-5deg);
-  }
-  100% {
-    transform: rotate(0);
-  }
-}
-@keyframes bounce {
-  0% {
-    transform: translate(0);
-  }
-  50% {
-    transform: translate(0, -3px);
-  }
-  100% {
-    transform: translate(0);
-  }
-}
-@keyframes shrink {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(0.9);
-  }
-  100% {
-    transform: scale(1);
   }
 }
 </style>
