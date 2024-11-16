@@ -12,12 +12,20 @@ const height = ref(0);
 const correctAnswer = computed(() => width.value * height.value);
 const gridSquares = ref<string[]>([]);
 const answer = ref(0);
+const showInteractionHint = ref(false);
 const showError = ref(false);
+const gameFieldClasses = computed(() => {
+  return [
+    showInteractionHint.value ? "interaction-hint" : "",
+    showError.value ? "error" : "",
+  ].join(" ");
+});
 const interval = ref<number | undefined>(undefined);
+let interactionTimeout: number;
 
 function start() {
   isStarted.value = true;
-  timeLeft.value = 600;
+  timeLeft.value = 60;
   gridSquares.value = [];
 
   // TODO: is there a better way to handle the timer in vue??
@@ -25,7 +33,7 @@ function start() {
   interval.value = setInterval(() => {
     timeLeft.value -= 1;
   }, 1000);
-  generateGrid();
+  nextProblem();
 }
 
 function getRandomInt(oldValue: number, min: number, max: number) {
@@ -38,35 +46,48 @@ function getRandomInt(oldValue: number, min: number, max: number) {
 
 // TODO: put the grid pattern logic into a unit-testable function
 // TODO: improve the algorithm to make the patterns as helpful as possible
-function generateGrid() {
+function nextProblem() {
   height.value = getRandomInt(height.value, 3, 9);
   width.value = getRandomInt(width.value, 3, 9);
-  const totalSquares = height.value * width.value;
-  gridSquares.value = Array(totalSquares).fill("");
+  gridSquares.value = generateGrid(width.value, height.value, ["r", "g", "b"]);
 
-  const options = ["r", "g", "b"];
-  let xFactor = Math.floor(width.value / options.length);
-  if (width.value < 6) {
-    xFactor = width.value;
+  showInteractionHint.value = false;
+  interactionTimeout = setTimeout(() => {
+    showInteractionHint.value = true;
+  }, 3000);
+}
+
+// TODO: move this to a separate file
+// TODO: add unit tests for this function
+function generateGrid(
+  width: number,
+  height: number,
+  options: string[],
+): string[] {
+  const grid = Array(width * height).fill("");
+  let xFactor = Math.floor(width / options.length);
+  if (width < 6) {
+    xFactor = width;
   }
-  let yFactor = Math.floor(height.value / options.length);
-  if (height.value < 6) {
-    yFactor = height.value;
+  let yFactor = Math.floor(height / options.length);
+  if (height < 6) {
+    yFactor = height;
   }
 
-  for (let x = 0; x < width.value; x++) {
-    for (let y = 0; y < height.value; y++) {
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
       // Make the cool pattern
       // TODO: describe in more detail what is going on here
       const index =
         (Math.floor(x / xFactor) + Math.floor(y / yFactor)) % options.length;
-      gridSquares.value[y * width.value + x] = options[index];
+      grid[y * width + x] = options[index];
     }
   }
-  console.log(Array.from(gridSquares.value));
+  return grid;
 }
 
 function handleKeyboardButton(value: number) {
+  clearTimeout(interactionTimeout);
   answer.value = answer.value * 10 + value;
   if (answer.value.toString().length == correctAnswer.value.toString().length) {
     checkAnswer();
@@ -79,7 +100,7 @@ function checkAnswer() {
   const isCorrect = answer.value == correctAnswer.value;
   if (isCorrect) {
     score.value++;
-    generateGrid();
+    nextProblem();
   } else {
     showError.value = true;
   }
@@ -90,7 +111,7 @@ function checkAnswer() {
 <template>
   <main>
     <div id="game-field-container">
-      <div id="game-field" :class="showError ? 'error' : ''">
+      <div id="game-field" :class="gameFieldClasses">
         <template v-if="isStarted && timeLeft > 0">
           <div id="status-row">
             <div class="number-box">
@@ -127,9 +148,10 @@ function checkAnswer() {
             </button>
           </div>
         </template>
-        <button v-else-if="!isStarted" type="button" @click="start()" autofocus>
-          Start
-        </button>
+        <template v-else-if="!isStarted">
+          <div class="large-box huge-text">×</div>
+          <button type="button" @click="start()" autofocus>▶️</button>
+        </template>
         <template v-else>
           <div class="large-box">
             {{ score }}
@@ -183,6 +205,10 @@ input {
   border-radius: 24px;
   container-type: size;
   transition: all 50ms;
+  &.interaction-hint button {
+    outline: 1px solid transparent;
+    animation: outline-fade 2s infinite;
+  }
   &.error {
     /* TODO: make this better for color blind */
     border-color: red;
@@ -258,6 +284,7 @@ input {
 #keyboard {
   flex: 2;
   display: grid;
+  gap: 4px;
   grid-template-columns: repeat(5, 1fr);
 
   container-type: size;
@@ -266,6 +293,7 @@ input {
     background: transparent;
     font-size: 20cqh;
     line-height: 1;
+    outline: 1px solid transparent;
     &:active {
       background: #88888888;
     }
@@ -279,6 +307,21 @@ input {
   background: #444;
   border-radius: 16px;
   font-size: 10vh;
+  line-height: 1;
+
+  &.huge-text {
+    font-size: 60cqh;
+  }
+}
+.large-box + button {
+  background: transparent;
+  outline: 5px solid transparent;
+  animation: outline-fade 2s ease-in-out infinite;
+  width: 40cqw;
+  border-radius: 25%;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  font-size: 10cqh;
 }
 .number-box {
   padding: 4px 16px;
@@ -305,6 +348,16 @@ input {
   &.r {
     background: red;
     border-radius: 24px;
+  }
+}
+
+@keyframes outline-fade {
+  0%,
+  100% {
+    outline-color: transparent;
+  }
+  50% {
+    outline-color: white;
   }
 }
 </style>
