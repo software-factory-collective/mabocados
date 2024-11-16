@@ -2,7 +2,7 @@
 import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 
-defineProps<{ level: string }>();
+const { level = 10 } = defineProps<{ level: number }>();
 
 const isStarted = ref(false);
 const timeLeft = ref(0);
@@ -20,7 +20,7 @@ const gameFieldClasses = computed(() => {
     showError.value ? "error" : "",
   ].join(" ");
 });
-const interval = ref<number | undefined>(undefined);
+let countDownInterval: number;
 let interactionTimeout: number;
 
 function start() {
@@ -28,10 +28,12 @@ function start() {
   timeLeft.value = 60;
   gridSquares.value = [];
 
-  // TODO: is there a better way to handle the timer in vue??
-  clearInterval(interval.value);
-  interval.value = setInterval(() => {
+  clearInterval(countDownInterval);
+  countDownInterval = setInterval(() => {
     timeLeft.value -= 1;
+    if (timeLeft.value <= 0) {
+      clearInterval(countDownInterval);
+    }
   }, 1000);
   nextProblem();
 }
@@ -47,8 +49,8 @@ function getRandomInt(oldValue: number, min: number, max: number) {
 // TODO: put the grid pattern logic into a unit-testable function
 // TODO: improve the algorithm to make the patterns as helpful as possible
 function nextProblem() {
-  height.value = getRandomInt(height.value, 3, 9);
-  width.value = getRandomInt(width.value, 3, 9);
+  height.value = getRandomInt(height.value, 1, level);
+  width.value = getRandomInt(width.value, 1, level);
   gridSquares.value = generateGrid(width.value, height.value, ["r", "g", "b"]);
 
   showInteractionHint.value = false;
@@ -92,8 +94,9 @@ function handleKeyboardButton(value: number) {
   if (answer.value.toString().length == correctAnswer.value.toString().length) {
     checkAnswer();
   }
-  // TODO: set a 5 second timer, check answer if user doesn't input another value
-  // so they don't get confused of why there is no submit button
+  // If the user doesn't hit a button within 5 seconds, they must be confused
+  // and think that the answer has less digits than it does. Show an error
+  interactionTimeout = setTimeout(checkAnswer, 5000);
 }
 function checkAnswer() {
   showError.value = false;
@@ -103,6 +106,7 @@ function checkAnswer() {
     nextProblem();
   } else {
     showError.value = true;
+    // TODO: display hint
   }
   answer.value = 0;
 }
