@@ -99,7 +99,9 @@ function checkAnswer() {
             {{ score.toString().padStart(2, "0") }}
           </div>
         </div>
-        <div id="factors" class="text-5xl">{{ width }} × {{ height }}</div>
+        <div id="factors">
+          <span>{{ width }} × {{ height }}</span>
+        </div>
         <div
           id="grid"
           class="large-box"
@@ -198,6 +200,7 @@ input {
   flex-direction: row;
   align-items: start;
   justify-content: space-between;
+  container-type: size;
 }
 
 #factors {
@@ -205,6 +208,12 @@ input {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  container-type: size;
+
+  span {
+    font-size: 80cqh;
+    line-height: 1;
+  }
 }
 
 #grid {
@@ -256,7 +265,7 @@ input {
 }
 .number-box {
   padding: 4px 16px;
-  font-size: 2rem;
+  font-size: 50cqh;
   font-family: mono;
   border-radius: 16px;
   background: #444;
