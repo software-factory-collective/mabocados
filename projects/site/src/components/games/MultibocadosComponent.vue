@@ -3,6 +3,7 @@ import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 
 const { level = 10 } = defineProps<{ level?: number }>();
+console.log("LEVEL:", level, typeof level);
 
 const isStarted = ref(false);
 const timeLeft = ref(0);
@@ -41,7 +42,7 @@ function start() {
 
 function getRandomInt(oldValue: number, min: number, max: number) {
   let newValue = oldValue;
-  while (newValue == oldValue) {
+  while (newValue == oldValue && min < max) {
     newValue = Math.floor(Math.random() * (max - min + 1)) + min;
   }
   return newValue;
@@ -52,13 +53,34 @@ function getRandomInt(oldValue: number, min: number, max: number) {
 function nextProblem() {
   height.value = getRandomInt(height.value, 1, level);
   width.value = getRandomInt(width.value, 1, level);
-  gridSquares.value = generateGrid(width.value, height.value, ["r", "g", "b"]);
+  // TODO: add more options for more visual interest
+  const options = ["b", "g", "r"];
+  shuffle(options);
+  gridSquares.value = generateGrid(width.value, height.value, options);
 
   clearTimeout(interactionTimeout);
   showInteractionHint.value = false;
   interactionTimeout = setTimeout(() => {
     showInteractionHint.value = true;
   }, 10000);
+}
+
+// TODO: find a better algorithm. this is from https://stackoverflow.com/a/2450976
+function shuffle(array) {
+  let currentIndex = array.length;
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+    // Pick a remaining element...
+    let randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
+  }
 }
 
 // TODO: move this to a separate file
