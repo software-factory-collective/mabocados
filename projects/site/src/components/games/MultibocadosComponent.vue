@@ -15,7 +15,7 @@ const interval = ref<number | undefined>(undefined);
 
 function start() {
   isStarted.value = true;
-  timeLeft.value = 60;
+  timeLeft.value = 600;
   gridSquares.value = [];
 
   // TODO: is there a better way to handle the timer in vue??
@@ -80,12 +80,9 @@ function checkAnswer() {
 
 <template>
   <main>
-    <div
-      class="game-field flex flex-col items-center"
-      :class="showError ? 'error' : ''"
-    >
+    <div id="game-field" :class="showError ? 'error' : ''">
       <template v-if="isStarted && timeLeft > 0">
-        <div class="w-full m-4 flex flex-row justify-between items-center">
+        <div id="status-row">
           <div class="number-box">
             {{ timeLeft.toString().padStart(2, "0") }}
           </div>
@@ -93,9 +90,9 @@ function checkAnswer() {
             {{ score.toString().padStart(2, "0") }}
           </div>
         </div>
-        <div class="m-4 text-5xl">{{ width }} × {{ height }}</div>
+        <div id="factors" class="text-5xl">{{ width }} × {{ height }}</div>
         <div
-          class="grid gap-2"
+          id="grid"
           :style="{ gridTemplateColumns: 'repeat(' + width + ', 1fr)' }"
         >
           <div
@@ -105,6 +102,7 @@ function checkAnswer() {
           ></div>
         </div>
         <form
+          id="answers"
           @submit.prevent="checkAnswer"
           class="mb-4 mt-4"
           autocomplete="off"
@@ -122,7 +120,7 @@ function checkAnswer() {
         Start
       </button>
       <template v-else>
-        <div class="number-box">
+        <div class="large-box">
           {{ score }}
         </div>
         <button type="button" @click="start()" autofocus>Restart</button>
@@ -152,11 +150,12 @@ input {
   border: 1px white solid;
 }
 
-.game-field {
+#game-field {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 16px;
+  align-items: stretch;
   justify-content: stretch;
   aspect-ratio: 9/16;
   padding: 16px;
@@ -171,14 +170,45 @@ input {
 }
 
 @media screen and (orientation: portrait) {
-  .game-field {
+  #game-field {
     margin: auto 16px;
   }
 }
 @media screen and (orientation: landscape) {
-  .game-field {
+  #game-field {
     margin: 16px auto;
   }
+}
+
+#status-row {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#factors {
+  flex: 1;
+}
+
+#grid {
+  flex: 4;
+  container-type: size;
+  display: grid;
+  gap: 4px;
+}
+
+#answer {
+  flex: 2;
+}
+.large-box {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #444;
+  border-radius: 16px;
+  font-size: 10vh;
 }
 .number-box {
   margin: 16px;
@@ -191,8 +221,6 @@ input {
 }
 
 .sq {
-  width: 3%;
-  height: 3%;
   background: gray;
   border-radius: 8px;
 
