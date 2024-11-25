@@ -1,104 +1,190 @@
 <script setup lang="ts">
+import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 
-defineProps<{ level: string }>();
+const { level = 10 } = defineProps<{ level?: number }>();
+console.log("LEVEL:", level, typeof level);
 
 const isStarted = ref(false);
 const timeLeft = ref(0);
+const isGameRunning = computed(() => isStarted.value && timeLeft.value > 0);
 const score = ref(0);
-const width = ref(0);
-const height = ref(0);
+const width = ref(1);
+const height = ref(1);
+const correctAnswer = computed(() => width.value * height.value);
 const gridSquares = ref<string[]>([]);
-const answer = ref(null);
+const answer = ref(0);
+const showInteractionHint = ref(false);
 const showError = ref(false);
-const interval = ref<number | undefined>(undefined);
+const gameFieldClasses = computed(() => {
+  return [
+    showInteractionHint.value ? "interaction-hint" : "",
+    showError.value && isGameRunning.value ? "error" : "",
+  ].join(" ");
+});
+let countDownInterval: number;
+let interactionTimeout: number;
 
 function start() {
   isStarted.value = true;
   timeLeft.value = 60;
+  score.value = 0;
+  width.value = 1;
+  height.value = 1;
   gridSquares.value = [];
 
-  // TODO: is there a better way to handle the timer in vue??
-  clearInterval(interval.value);
-  interval.value = setInterval(() => {
+  clearInterval(countDownInterval);
+  countDownInterval = setInterval(() => {
     timeLeft.value -= 1;
+    if (timeLeft.value <= 0) {
+      clearInterval(countDownInterval);
+      clearTimeout(interactionTimeout);
+    }
   }, 1000);
-  generateGrid();
+  nextProblem();
 }
 
-function getRandomInt(oldValue: number, min: number, max: number) {
-  let newValue = oldValue;
-  while (newValue == oldValue) {
-    newValue = Math.floor(Math.random() * (max - min + 1)) + min;
+function generateFactor(oldValue: number, min: number, max: number) {
+  const options = [];
+  for (let option = min; option <= max; option++) {
+    options.push(option);
+    // Every option that is not the current value and also not zero
+    // should have twice the likelihood.
+    if (option != oldValue && option != 0) {
+      options.push(option);
+    }
   }
-  return newValue;
+  if (options.length == 0) {
+    throw Error("Somehow there are no options!");
+  }
+  const randomIndex = Math.floor(Math.random() * options.length);
+  return options[randomIndex];
 }
 
 // TODO: put the grid pattern logic into a unit-testable function
 // TODO: improve the algorithm to make the patterns as helpful as possible
-function generateGrid() {
-  height.value = getRandomInt(height.value, 3, 9);
-  width.value = getRandomInt(width.value, 3, 9);
-  const totalSquares = height.value * width.value;
-  gridSquares.value = Array(totalSquares).fill("");
+function nextProblem() {
+  height.value = generateFactor(height.value, 0, level);
+  width.value = generateFactor(width.value, 0, level);
+  // TODO: add more options for more visual interest
+  const options = ["b", "g", "r"];
+  shuffle(options);
+  gridSquares.value = generateGrid(width.value, height.value, options);
 
-  const options = ["r", "g", "b"];
-  let xFactor = Math.floor(width.value / options.length);
-  if (width.value < 6) {
-    xFactor = width.value;
+  clearTimeout(interactionTimeout);
+  showInteractionHint.value = false;
+  interactionTimeout = setTimeout(() => {
+    showInteractionHint.value = true;
+  }, 10000);
+}
+
+// TODO: find a better algorithm. this is from https://stackoverflow.com/a/2450976
+function shuffle(array) {
+  let currentIndex = array.length;
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+    // Pick a remaining element...
+    let randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
   }
-  let yFactor = Math.floor(height.value / options.length);
-  if (height.value < 6) {
-    yFactor = height.value;
+}
+
+// TODO: move this to a separate file
+// TODO: add unit tests for this function
+function generateGrid(
+  width: number,
+  height: number,
+  options: string[],
+): string[] {
+  const grid = Array(width * height).fill("");
+  let xFactor = Math.floor(width / options.length);
+  if (width < 6) {
+    xFactor = width;
+  }
+  let yFactor = Math.floor(height / options.length);
+  if (height < 6) {
+    yFactor = height;
   }
 
-  for (let x = 0; x < width.value; x++) {
-    for (let y = 0; y < height.value; y++) {
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
       // Make the cool pattern
       // TODO: describe in more detail what is going on here
       const index =
         (Math.floor(x / xFactor) + Math.floor(y / yFactor)) % options.length;
-      gridSquares.value[y * width.value + x] = options[index];
+      grid[y * width + x] = options[index];
     }
   }
-  console.log(Array.from(gridSquares.value));
+  return grid;
+}
+
+function onKeyUp(event) {
+  console.log(event);
+  if (isGameRunning.value) {
+    if ("0123456789".includes(event.key)) {
+      handleKeyboardButton(+event.key);
+    }
+  } else {
+    const startKeys = [" ", "s", "Enter"];
+    if (startKeys.includes(event.key)) {
+      start();
+    }
+  }
+}
+
+function handleKeyboardButton(value: number) {
+  clearTimeout(interactionTimeout);
+  showInteractionHint.value = false;
+  answer.value = answer.value * 10 + value;
+  if (answer.value.toString().length == correctAnswer.value.toString().length) {
+    checkAnswer();
+  } else {
+    // If the user doesn't hit a button within 5 seconds, they must be confused
+    // and think that the answer has less digits than it does. Show an error
+    interactionTimeout = setTimeout(checkAnswer, 5000);
+  }
 }
 
 function checkAnswer() {
   showError.value = false;
-  const isCorrect = answer.value == width.value * height.value;
-  console.log("is correct:", isCorrect);
+  const isCorrect = answer.value == correctAnswer.value;
   if (isCorrect) {
     score.value++;
-    generateGrid();
+    nextProblem();
   } else {
     showError.value = true;
+    // TODO: display answer hint
   }
-  answer.value = null;
+  answer.value = 0;
 }
 </script>
 
 <template>
   <main>
-    <h1 class="text-4xl">Multibocados</h1>
-    <!-- <div class="text-xl">Level {{ level }}</div> -->
-    <template v-if="isStarted">
-      <div
-        class="game-field flex flex-col items-center"
-        :class="showError ? 'error' : ''"
-      >
-        <template v-if="timeLeft > 0">
-          <div class="w-full m-4 flex flex-row justify-between items-center">
+    <div id="game-field-container" tabindex="0" @keyup="onKeyUp">
+      <div id="game-field" :class="gameFieldClasses">
+        <template v-if="isGameRunning">
+          <div id="status-row">
             <div class="number-box">
-              {{ timeLeft.toString().padStart(2, "0") }}
+              ⏱ {{ timeLeft.toString().padStart(2, "0") }}
             </div>
             <div class="number-box">
-              {{ score.toString().padStart(2, "0") }}
+              🥑 {{ score.toString().padStart(2, "0") }}
             </div>
           </div>
-          <div class="m-4 text-5xl">{{ width }} × {{ height }}</div>
+          <div id="factors">
+            <span>{{ width }} × {{ height }}</span>
+          </div>
           <div
-            class="grid gap-2"
+            id="grid"
+            class="large-box"
             :style="{ gridTemplateColumns: 'repeat(' + width + ', 1fr)' }"
           >
             <div
@@ -107,29 +193,36 @@ function checkAnswer() {
               :class="'sq ' + square"
             ></div>
           </div>
-          <form
-            @submit.prevent="checkAnswer"
-            class="mb-4 mt-4"
-            autocomplete="off"
-          >
-            <input
-              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="answer"
-              type="number"
-              v-model="answer"
-              autofocus
-            />
-          </form>
+          <div id="answer">
+            <span>{{ answer }}</span>
+          </div>
+          <div id="keyboard">
+            <button
+              v-for="value in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]"
+              :key="value"
+              @click="handleKeyboardButton(value)"
+            >
+              {{ value }}
+            </button>
+          </div>
+        </template>
+        <template v-else-if="!isStarted">
+          <div class="large-box">
+            <span class="huge-text">×</span>
+            <span class="level-number">{{ level }}</span>
+          </div>
+          <div>
+            <button type="button" @click="start()" autofocus>▶️</button>
+          </div>
         </template>
         <template v-else>
-          <div class="number-box">
-            {{ score }}
+          <div class="large-box">🥑 {{ score }}</div>
+          <div>
+            <button type="button" @click="start()" autofocus>🔄</button>
           </div>
-          <button type="button" @click="start()" autofocus>Restart</button>
         </template>
       </div>
-    </template>
-    <button v-else type="button" @click="start()" autofocus>Start</button>
+    </div>
   </main>
 </template>
 
@@ -142,6 +235,7 @@ main {
   align-items: center;
   justify-content: center;
   padding: 16px;
+  overflow: clip;
 }
 button {
   background: gray;
@@ -153,27 +247,162 @@ input {
   color: white;
   border: 1px white solid;
 }
-
-.game-field {
+#game-field-container {
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0%;
+  max-height: 100%;
+}
+#game-field {
+  flex-grow: 1;
+  min-height: 0%;
+  max-height: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 50vw;
-  min-height: 50vh;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+  justify-content: stretch;
+  aspect-ratio: 9/16;
   padding: 16px;
   background: #333;
+  border: 8px #222 solid;
   border-radius: 24px;
+  container-type: size;
   transition: all 50ms;
-
+  &.interaction-hint button {
+    animation: outline-fade 2s infinite;
+  }
   &.error {
-    border: 8px red solid;
+    /* TODO: make this better for color blind */
+    border-color: red;
+    #answer {
+      background-color: red;
+    }
   }
 }
 
+@media screen and (orientation: portrait) {
+  #game-field-container {
+    min-width: 100%;
+    min-height: 0%;
+  }
+  #game-field {
+    margin: auto 0;
+  }
+}
+@media screen and (orientation: landscape) {
+  #game-field-container {
+    min-height: 100%;
+  }
+  #game-field {
+    margin: 0 auto;
+  }
+}
+
+#status-row {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  justify-content: space-between;
+  container-type: size;
+}
+
+#factors {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  container-type: size;
+
+  > span {
+    font-size: 80cqh;
+    line-height: 1;
+  }
+}
+
+#grid {
+  container-type: size;
+  display: grid;
+  gap: 4px;
+  align-items: stretch;
+  background: transparent;
+}
+
+#answer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #222;
+  border-radius: 32px;
+  container-type: size;
+
+  > span {
+    font-family: mono;
+    font-size: 80cqh;
+    line-height: 1;
+  }
+}
+#keyboard {
+  flex: 2;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(5, 1fr);
+
+  container-type: size;
+
+  > button {
+    background: transparent;
+    font-size: 20cqh;
+    line-height: 1;
+    outline: 1px solid transparent;
+    &:active {
+      background: #88888888;
+    }
+  }
+}
+.large-box {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #444;
+  border-radius: 16px;
+  font-size: 10vh;
+  line-height: 1;
+
+  & > .huge-text {
+    font-size: 50cqh;
+  }
+
+  & > .level-number {
+    font-size: 20cqh;
+  }
+
+  & + div {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & > button {
+      background: transparent;
+      outline: 5px solid transparent;
+      animation: outline-fade 2s ease-in-out infinite;
+      width: 40cqw;
+      border-radius: 25%;
+      aspect-ratio: 1;
+      margin: 0 auto;
+      font-size: 10cqh;
+    }
+  }
+}
 .number-box {
-  margin: 16px;
   padding: 4px 16px;
-  font-size: 2rem;
+  font-size: 50cqh;
   font-family: mono;
   border-radius: 16px;
   background: #444;
@@ -181,65 +410,31 @@ input {
 }
 
 .sq {
-  width: 3vw;
-  height: 3vw;
   background: gray;
   border-radius: 8px;
 
   &.g {
     background: green;
-
-    /* animation: shrink 0.77s linear infinite;*/
   }
 
   &.b {
     background: blue;
     border-radius: 2px;
-
-    /* animation: jiggle 0.4s ease-in-out infinite;*/
   }
 
   &.r {
     background: red;
     border-radius: 24px;
+  }
+}
 
-    /* animation: bounce 0.34s ease-in-out infinite;*/
-  }
-}
-@keyframes jiggle {
-  0% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(5deg);
-  }
-  75% {
-    transform: rotate(-5deg);
-  }
+@keyframes outline-fade {
+  0%,
   100% {
-    transform: rotate(0);
-  }
-}
-@keyframes bounce {
-  0% {
-    transform: translate(0);
+    outline-color: transparent;
   }
   50% {
-    transform: translate(0, -3px);
-  }
-  100% {
-    transform: translate(0);
-  }
-}
-@keyframes shrink {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(0.9);
-  }
-  100% {
-    transform: scale(1);
+    outline-color: white;
   }
 }
 </style>
