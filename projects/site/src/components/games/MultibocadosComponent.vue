@@ -188,7 +188,10 @@ function checkAnswer() {
           </div>
         </template>
         <template v-else-if="!isStarted">
-          <div class="large-box huge-text">×</div>
+          <div class="large-box">
+            <span class="huge-text">×</span>
+            <span class="level-number">{{ level }}</span>
+          </div>
           <div>
             <button type="button" @click="start()" autofocus>▶️</button>
           </div>
@@ -349,8 +352,12 @@ input {
   font-size: 10vh;
   line-height: 1;
 
-  &.huge-text {
-    font-size: 60cqh;
+  & > .huge-text {
+    font-size: 50cqh;
+  }
+
+  & > .level-number {
+    font-size: 20cqh;
   }
 
   & + div {
