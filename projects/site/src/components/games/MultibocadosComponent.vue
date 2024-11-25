@@ -180,11 +180,15 @@ function checkAnswer() {
         </template>
         <template v-else-if="!isStarted">
           <div class="large-box huge-text">×</div>
-          <button type="button" @click="start()" autofocus>▶️</button>
+          <div>
+            <button type="button" @click="start()" autofocus>▶️</button>
+          </div>
         </template>
         <template v-else>
           <div class="large-box">🥑 {{ score }}</div>
-          <button type="button" @click="start()" autofocus>🔄</button>
+          <div>
+            <button type="button" @click="start()" autofocus>🔄</button>
+          </div>
         </template>
       </div>
     </div>
@@ -339,16 +343,24 @@ input {
   &.huge-text {
     font-size: 60cqh;
   }
-}
-.large-box + button {
-  background: transparent;
-  outline: 5px solid transparent;
-  animation: outline-fade 2s ease-in-out infinite;
-  width: 40cqw;
-  border-radius: 25%;
-  aspect-ratio: 1;
-  margin: 0 auto;
-  font-size: 10cqh;
+
+  & + div {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & > button {
+      background: transparent;
+      outline: 5px solid transparent;
+      animation: outline-fade 2s ease-in-out infinite;
+      width: 40cqw;
+      border-radius: 25%;
+      aspect-ratio: 1;
+      margin: 0 auto;
+      font-size: 10cqh;
+    }
+  }
 }
 .number-box {
   padding: 4px 16px;
