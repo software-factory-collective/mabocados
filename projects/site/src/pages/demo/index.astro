@@ -23,8 +23,8 @@ for (let level = 1; level <= 20; level++) {
     <ol class="flex flex-row overflow-auto gap-2 flex-wrap justify-center max-w-[960px]">
     {levels.map((level) => (
         
-<li class="w-32 h-32 bg-gray-800 hover:bg-gray-700 rounded-xl flex items-center justify-center">
-<a href={"/demo/multibocados/" + level} class="flex flex-row items-center gap-2"><span class="text-6xl">×</span><span class="text-5xl">{level}</span></a>
+<li>
+<a href={"/demo/multibocados/" + level} class="w-32 h-32 bg-gray-800 hover:bg-gray-700 rounded-xl flex flex-row gap-2 items-center justify-center"><span class="text-6xl">×</span><span class="text-5xl">{level}</span></a>
 </li>
     ))
         

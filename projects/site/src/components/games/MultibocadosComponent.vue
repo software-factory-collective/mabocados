@@ -248,13 +248,16 @@ input {
   border: 1px white solid;
 }
 #game-field-container {
+  width: 100%;
   min-width: 100%;
   max-width: 100%;
+  height: 100%;
   min-height: 0%;
   max-height: 100%;
 }
 #game-field {
   flex-grow: 1;
+  min-height: 0%;
   max-height: 100%;
   display: flex;
   flex-direction: column;
