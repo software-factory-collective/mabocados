@@ -8,8 +8,8 @@ console.log("LEVEL:", level, typeof level);
 const isStarted = ref(false);
 const timeLeft = ref(0);
 const score = ref(0);
-const width = ref(0);
-const height = ref(0);
+const width = ref(1);
+const height = ref(1);
 const correctAnswer = computed(() => width.value * height.value);
 const gridSquares = ref<string[]>([]);
 const answer = ref(0);
@@ -40,19 +40,28 @@ function start() {
   nextProblem();
 }
 
-function getRandomInt(oldValue: number, min: number, max: number) {
-  let newValue = oldValue;
-  while (newValue == oldValue && min < max) {
-    newValue = Math.floor(Math.random() * (max - min + 1)) + min;
+function generateFactor(oldValue: number, min: number, max: number) {
+  const options = [];
+  for (let option = min; option <= max; option++) {
+    options.push(option);
+    // Every option that is not the current value and also not zero
+    // should have twice the likelihood.
+    if (option != oldValue && option != 0) {
+      options.push(option);
+    }
   }
-  return newValue;
+  if (options.length == 0) {
+    throw Error("Somehow there are no options!");
+  }
+  const randomIndex = Math.floor(Math.random() * options.length);
+  return options[randomIndex];
 }
 
 // TODO: put the grid pattern logic into a unit-testable function
 // TODO: improve the algorithm to make the patterns as helpful as possible
 function nextProblem() {
-  height.value = getRandomInt(height.value, 1, level);
-  width.value = getRandomInt(width.value, 1, level);
+  height.value = generateFactor(height.value, 0, level);
+  width.value = generateFactor(width.value, 0, level);
   // TODO: add more options for more visual interest
   const options = ["b", "g", "r"];
   shuffle(options);
