@@ -19,7 +19,7 @@ const showError = ref(false);
 const gameFieldClasses = computed(() => {
   return [
     showInteractionHint.value ? "interaction-hint" : "",
-    showError.value ? "error" : "",
+    showError.value && isGameRunning.value ? "error" : "",
   ].join(" ");
 });
 let countDownInterval: number;
