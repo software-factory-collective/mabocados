@@ -49,9 +49,11 @@ function generateFactor(oldValue: number, min: number, max: number) {
   for (let option = min; option <= max; option++) {
     options.push(option);
     // Every option that is not the current value and also not zero
-    // should have twice the likelihood.
+    // should have 10 times more likelihood.
     if (option != oldValue && option != 0) {
-      options.push(option);
+      for (let i = 0; i < 9; i++) {
+        options.push(option);
+      }
     }
   }
   if (options.length == 0) {
