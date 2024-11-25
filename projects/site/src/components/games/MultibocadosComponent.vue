@@ -7,6 +7,7 @@ console.log("LEVEL:", level, typeof level);
 
 const isStarted = ref(false);
 const timeLeft = ref(0);
+const isGameRunning = computed(() => isStarted.value && timeLeft.value > 0);
 const score = ref(0);
 const width = ref(1);
 const height = ref(1);
@@ -27,6 +28,9 @@ let interactionTimeout: number;
 function start() {
   isStarted.value = true;
   timeLeft.value = 60;
+  score.value = 0;
+  width.value = 1;
+  height.value = 1;
   gridSquares.value = [];
 
   clearInterval(countDownInterval);
@@ -121,6 +125,20 @@ function generateGrid(
   return grid;
 }
 
+function onKeyUp(event) {
+  console.log(event);
+  if (isGameRunning.value) {
+    if ("0123456789".includes(event.key)) {
+      handleKeyboardButton(+event.key);
+    }
+  } else {
+    const startKeys = [" ", "s", "Enter"];
+    if (startKeys.includes(event.key)) {
+      start();
+    }
+  }
+}
+
 function handleKeyboardButton(value: number) {
   clearTimeout(interactionTimeout);
   showInteractionHint.value = false;
@@ -133,6 +151,7 @@ function handleKeyboardButton(value: number) {
     interactionTimeout = setTimeout(checkAnswer, 5000);
   }
 }
+
 function checkAnswer() {
   showError.value = false;
   const isCorrect = answer.value == correctAnswer.value;
@@ -149,9 +168,9 @@ function checkAnswer() {
 
 <template>
   <main>
-    <div id="game-field-container">
+    <div id="game-field-container" tabindex="0" @keyup="onKeyUp">
       <div id="game-field" :class="gameFieldClasses">
-        <template v-if="isStarted && timeLeft > 0">
+        <template v-if="isGameRunning">
           <div id="status-row">
             <div class="number-box">
               ⏱ {{ timeLeft.toString().padStart(2, "0") }}
