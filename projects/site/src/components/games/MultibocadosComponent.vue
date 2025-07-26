@@ -132,6 +132,10 @@ function onKeyUp(event) {
   if (isGameRunning.value) {
     if ("0123456789".includes(event.key)) {
       handleKeyboardButton(+event.key);
+    } else if (event.key === "Backspace") {
+      handleKeyboardButton("⌫");
+    } else if (event.key === "Enter") {
+      handleKeyboardButton("↩");
     }
   } else {
     const startKeys = [" ", "s", "Enter"];
@@ -141,10 +145,18 @@ function onKeyUp(event) {
   }
 }
 
-function handleKeyboardButton(value: number) {
+function handleKeyboardButton(value: number | string) {
+  if (value === "⌫") {
+    answer.value = Math.floor(answer.value / 10);
+    return;
+  }
+  if (value === "↩") {
+    checkAnswer();
+    return;
+  }
   clearTimeout(interactionTimeout);
   showInteractionHint.value = false;
-  answer.value = answer.value * 10 + value;
+  answer.value = answer.value * 10 + (value as number);
   if (answer.value.toString().length == correctAnswer.value.toString().length) {
     checkAnswer();
   } else {
@@ -200,9 +212,13 @@ function checkAnswer() {
           </div>
           <div id="keyboard">
             <button
-              v-for="value in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]"
+              v-for="value in [0, 1, 2, 3, 4, '⌫', 5, 6, 7, 8, 9, '↩']"
               :key="value"
               @click="handleKeyboardButton(value)"
+              :class="{
+                'btn-backspace': value === '⌫',
+                'btn-enter': value === '↩'
+              }"
             >
               {{ value }}
             </button>
@@ -352,7 +368,7 @@ input {
   flex: 2;
   display: grid;
   gap: 4px;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
 
   container-type: size;
 
@@ -365,6 +381,14 @@ input {
       background: #88888888;
     }
   }
+}
+#keyboard > button.btn-backspace {
+  background: red;
+  color: white;
+}
+#keyboard > button.btn-enter {
+  background: green;
+  color: white;
 }
 .large-box {
   aspect-ratio: 1;
