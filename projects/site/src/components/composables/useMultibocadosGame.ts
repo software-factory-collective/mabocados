@@ -102,7 +102,7 @@ export function useMultibocadosGame(level = 10) {
     showInteractionHint.value = false;
 
     if (value === "⌫") {
-      answer.value = Math.floor(answer.value / 10);
+      answer.value = Math.floor((answer.value ?? 0) / 10);
       // After clearing the last digit we should show no digits, not 0
       if (answer.value == 0) {
         answer.value = null;
@@ -114,7 +114,7 @@ export function useMultibocadosGame(level = 10) {
       return;
     }
 
-    answer.value = answer.value * 10 + (value as number);
+    answer.value = (answer.value ?? 0) * 10 + (value as number);
   }
 
   function checkAnswer() {
