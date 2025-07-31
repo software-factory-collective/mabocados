@@ -1,188 +1,45 @@
 <script setup lang="ts">
-import { computed } from "@vue/reactivity";
-import { ref } from "vue";
-
+import { useMultibocadosGame } from "../composables/useMultibocadosGame";
 const { level = 10 } = defineProps<{ level?: number }>();
-console.log("LEVEL:", level, typeof level);
 
-const isStarted = ref(false);
-const timeLeft = ref(0);
-const isGameRunning = computed(() => isStarted.value && timeLeft.value > 0);
-const score = ref(0);
-const width = ref(1);
-const height = ref(1);
-const correctAnswer = computed(() => width.value * height.value);
-const gridSquares = ref<string[]>([]);
-const answer = ref(0);
-const showInteractionHint = ref(false);
-const showError = ref(false);
-const gameFieldClasses = computed(() => {
-  return [
-    showInteractionHint.value ? "interaction-hint" : "",
-    showError.value && isGameRunning.value ? "error" : "",
-  ].join(" ");
-});
-let countDownInterval: number;
-let interactionTimeout: number;
-
-function start() {
-  isStarted.value = true;
-  timeLeft.value = 60;
-  score.value = 0;
-  width.value = 1;
-  height.value = 1;
-  gridSquares.value = [];
-
-  clearInterval(countDownInterval);
-  countDownInterval = setInterval(() => {
-    timeLeft.value -= 1;
-    if (timeLeft.value <= 0) {
-      clearInterval(countDownInterval);
-      clearTimeout(interactionTimeout);
-    }
-  }, 1000);
-  nextProblem();
-}
-
-function generateFactor(oldValue: number, min: number, max: number) {
-  const options = [];
-  for (let option = min; option <= max; option++) {
-    options.push(option);
-    // Every option that is not the current value and also not zero
-    // should have 10 times more likelihood.
-    if (option != oldValue && option != 0) {
-      for (let i = 0; i < 9; i++) {
-        options.push(option);
-      }
-    }
-  }
-  if (options.length == 0) {
-    throw Error("Somehow there are no options!");
-  }
-  const randomIndex = Math.floor(Math.random() * options.length);
-  return options[randomIndex];
-}
-
-// TODO: put the grid pattern logic into a unit-testable function
-// TODO: improve the algorithm to make the patterns as helpful as possible
-function nextProblem() {
-  height.value = generateFactor(height.value, 0, level);
-  width.value = generateFactor(width.value, 0, level);
-  // TODO: add more options for more visual interest
-  const options = ["b", "g", "r"];
-  shuffle(options);
-  gridSquares.value = generateGrid(width.value, height.value, options);
-
-  clearTimeout(interactionTimeout);
-  showInteractionHint.value = false;
-  interactionTimeout = setTimeout(() => {
-    showInteractionHint.value = true;
-  }, 10000);
-}
-
-// TODO: find a better algorithm. this is from https://stackoverflow.com/a/2450976
-function shuffle(array) {
-  let currentIndex = array.length;
-
-  // While there remain elements to shuffle...
-  while (currentIndex != 0) {
-    // Pick a remaining element...
-    let randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex],
-      array[currentIndex],
-    ];
-  }
-}
-
-// TODO: move this to a separate file
-// TODO: add unit tests for this function
-function generateGrid(
-  width: number,
-  height: number,
-  options: string[],
-): string[] {
-  const grid = Array(width * height).fill("");
-  let xFactor = Math.floor(width / options.length);
-  if (width < 6) {
-    xFactor = width;
-  }
-  let yFactor = Math.floor(height / options.length);
-  if (height < 6) {
-    yFactor = height;
-  }
-
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
-      // Make the cool pattern
-      // TODO: describe in more detail what is going on here
-      const index =
-        (Math.floor(x / xFactor) + Math.floor(y / yFactor)) % options.length;
-      grid[y * width + x] = options[index];
-    }
-  }
-  return grid;
-}
-
-function onKeyUp(event) {
-  console.log(event);
-  if (isGameRunning.value) {
-    if ("0123456789".includes(event.key)) {
-      handleKeyboardButton(+event.key);
-    }
-  } else {
-    const startKeys = [" ", "s", "Enter"];
-    if (startKeys.includes(event.key)) {
-      start();
-    }
-  }
-}
-
-function handleKeyboardButton(value: number) {
-  clearTimeout(interactionTimeout);
-  showInteractionHint.value = false;
-  answer.value = answer.value * 10 + value;
-  if (answer.value.toString().length == correctAnswer.value.toString().length) {
-    checkAnswer();
-  } else {
-    // If the user doesn't hit a button within 5 seconds, they must be confused
-    // and think that the answer has less digits than it does. Show an error
-    interactionTimeout = setTimeout(checkAnswer, 5000);
-  }
-}
-
-function checkAnswer() {
-  showError.value = false;
-  const isCorrect = answer.value == correctAnswer.value;
-  if (isCorrect) {
-    score.value++;
-    nextProblem();
-  } else {
-    showError.value = true;
-    // TODO: display answer hint
-  }
-  answer.value = 0;
-}
+const {
+  isStarted,
+  isGameRunning,
+  gridSquares,
+  width,
+  height,
+  timeLeft,
+  score,
+  answer,
+  showError,
+  gameFieldClasses,
+  start,
+  handleKeyboardButton,
+  onKeyDown,
+  onKeyUp,
+} = useMultibocadosGame(level);
 </script>
 
 <template>
   <main>
-    <div id="game-field-container" tabindex="0" @keyup="onKeyUp">
+    <div
+      id="game-field-container"
+      tabindex="0"
+      @keydown="onKeyDown"
+      @keyup="onKeyUp"
+    >
       <div id="game-field" :class="gameFieldClasses">
         <template v-if="isGameRunning">
           <div id="status-row">
             <div class="number-box">
               ⏱ {{ timeLeft.toString().padStart(2, "0") }}
             </div>
+            <div>
+              <span id="factors">{{ width }} × {{ height }}</span>
+            </div>
             <div class="number-box">
               🥑 {{ score.toString().padStart(2, "0") }}
             </div>
-          </div>
-          <div id="factors">
-            <span>{{ width }} × {{ height }}</span>
           </div>
           <div
             id="grid"
@@ -196,16 +53,35 @@ function checkAnswer() {
             ></div>
           </div>
           <div id="answer">
-            <span>{{ answer }}</span>
+            <span>{{ answer ?? "" }}</span>
           </div>
-          <div id="keyboard">
-            <button
-              v-for="value in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]"
-              :key="value"
-              @click="handleKeyboardButton(value)"
-            >
-              {{ value }}
-            </button>
+          <div id="keyboard" class="keyboard">
+            <div class="keyboard-row">
+              <button
+                v-for="n in [0, 1, 2, 3, 4]"
+                :key="n"
+                @click="handleKeyboardButton(n)"
+              >
+                {{ n }}
+              </button>
+            </div>
+            <div class="keyboard-row">
+              <button
+                v-for="n in [5, 6, 7, 8, 9]"
+                :key="n"
+                @click="handleKeyboardButton(n)"
+              >
+                {{ n }}
+              </button>
+            </div>
+            <div class="keyboard-row">
+              <button class="btn-backspace" @click="handleKeyboardButton('⌫')">
+                ⌫
+              </button>
+              <button class="btn-enter" @click="handleKeyboardButton('↩')">
+                ↩
+              </button>
+            </div>
           </div>
         </template>
         <template v-else-if="!isStarted">
@@ -239,16 +115,19 @@ main {
   padding: 16px;
   overflow: clip;
 }
+
 button {
   background: gray;
   border-radius: 8px;
   padding: 4px 8px;
 }
+
 input {
   background: transparent;
   color: white;
   border: 1px white solid;
 }
+
 #game-field-container {
   width: 100%;
   min-width: 100%;
@@ -257,6 +136,7 @@ input {
   min-height: 0%;
   max-height: 100%;
 }
+
 #game-field {
   flex-grow: 1;
   min-height: 0%;
@@ -294,6 +174,7 @@ input {
     margin: auto 0;
   }
 }
+
 @media screen and (orientation: landscape) {
   #game-field-container {
     min-height: 100%;
@@ -313,16 +194,8 @@ input {
 }
 
 #factors {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  container-type: size;
-
-  > span {
-    font-size: 80cqh;
-    line-height: 1;
-  }
+  font-size: 80cqh;
+  line-height: 1;
 }
 
 #grid {
@@ -348,24 +221,40 @@ input {
     line-height: 1;
   }
 }
-#keyboard {
-  flex: 2;
+
+.keyboard {
   display: grid;
-  gap: 4px;
-  grid-template-columns: repeat(5, 1fr);
-
-  container-type: size;
-
-  > button {
-    background: transparent;
-    font-size: 20cqh;
-    line-height: 1;
-    outline: 1px solid transparent;
-    &:active {
-      background: #88888888;
-    }
-  }
+  gap: 8px;
 }
+
+.keyboard-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.keyboard-row:last-of-type {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.keyboard button {
+  background: #444;
+  color: white;
+  font-size: 2rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.keyboard .btn-backspace {
+  background: red;
+  color: white;
+}
+
+.keyboard .btn-enter {
+  background: green;
+  color: white;
+}
+
 .large-box {
   aspect-ratio: 1;
   display: flex;
@@ -402,6 +291,7 @@ input {
     }
   }
 }
+
 .number-box {
   padding: 4px 16px;
   font-size: 50cqh;
