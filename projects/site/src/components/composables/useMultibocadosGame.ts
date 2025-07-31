@@ -47,7 +47,7 @@ export function useMultibocadosGame(level = 10) {
     const options = [];
     for (let option = min; option <= max; option++) {
       options.push(option);
-      if (option != oldValue && option != 0) {
+      if (option !== oldValue && option !== 0) {
         for (let i = 0; i < 9; i++) options.push(option);
       }
     }
@@ -57,7 +57,7 @@ export function useMultibocadosGame(level = 10) {
 
   function shuffle(array: any[]) {
     let currentIndex = array.length;
-    while (currentIndex != 0) {
+    while (currentIndex !== 0) {
       const randomIndex = Math.floor(Math.random() * currentIndex);
       currentIndex--;
       [array[currentIndex], array[randomIndex]] = [
