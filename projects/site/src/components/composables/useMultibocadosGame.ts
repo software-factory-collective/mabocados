@@ -30,6 +30,7 @@ export function useMultibocadosGame(level = 10) {
     width.value = 1;
     height.value = 1;
     gridSquares.value = [];
+    showError.value = false;
 
     clearInterval(countDownInterval);
     countDownInterval = setInterval(() => {
@@ -110,15 +111,6 @@ export function useMultibocadosGame(level = 10) {
     }
 
     answer.value = answer.value * 10 + (value as number);
-
-    if (
-      answer.value.toString().length ===
-      correctAnswer.value.toString().length
-    ) {
-      checkAnswer();
-    } else {
-      interactionTimeout = setTimeout(checkAnswer, 5000);
-    }
   }
 
   function checkAnswer() {

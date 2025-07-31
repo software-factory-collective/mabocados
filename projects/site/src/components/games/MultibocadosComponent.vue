@@ -41,15 +41,14 @@
           </div>
           <div id="keyboard" class="keyboard">
             <div class="keyboard-row">
-              <button v-for="n in [1,2,3]" :key="n" @click="handleKeyboardButton(n)">{{ n }}</button>
+              <button v-for="n in [0,1,2,3,4]" :key="n" @click="handleKeyboardButton(n)">{{ n }}</button>
+            </div>
+            <div class="keyboard-row">
+              <button v-for="n in [5,6,7,8,9]" :key="n" @click="handleKeyboardButton(n)">{{ n }}</button>
+            </div>
+            <div class="keyboard-row">
               <button class="btn-backspace" @click="handleKeyboardButton('⌫')">⌫</button>
-            </div>
-            <div class="keyboard-row">
-              <button v-for="n in [4,5,6]" :key="n" @click="handleKeyboardButton(n)">{{ n }}</button>
               <button class="btn-enter" @click="handleKeyboardButton('↩')">↩</button>
-            </div>
-            <div class="keyboard-row">
-              <button v-for="n in [7,8,9,0]" :key="n" @click="handleKeyboardButton(n)">{{ n }}</button>
             </div>
           </div>
         </template>
@@ -198,8 +197,12 @@ input {
 
 .keyboard-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
+}
+
+.keyboard-row:last-of-type {
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .keyboard button {
