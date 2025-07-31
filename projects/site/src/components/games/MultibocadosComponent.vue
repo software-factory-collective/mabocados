@@ -1,17 +1,33 @@
 <script setup lang="ts">
-  import { useMultibocadosGame } from "../composables/useMultibocadosGame";
-  const { level = 10 } = defineProps<{ level?: number }>();
+import { useMultibocadosGame } from "../composables/useMultibocadosGame";
+const { level = 10 } = defineProps<{ level?: number }>();
 
-  const { 
-    isStarted, isGameRunning, gridSquares, width, height,
-    timeLeft, score, answer, showError, gameFieldClasses,
-    start, handleKeyboardButton, onKeyUp
-  } = useMultibocadosGame(level);
+const {
+  isStarted,
+  isGameRunning,
+  gridSquares,
+  width,
+  height,
+  timeLeft,
+  score,
+  answer,
+  showError,
+  gameFieldClasses,
+  start,
+  handleKeyboardButton,
+  onKeyDown,
+  onKeyUp,
+} = useMultibocadosGame(level);
 </script>
 
 <template>
   <main>
-    <div id="game-field-container" tabindex="0" @keyup="onKeyUp">
+    <div
+      id="game-field-container"
+      tabindex="0"
+      @keydown="onKeyDown"
+      @keyup="onKeyUp"
+    >
       <div id="game-field" :class="gameFieldClasses">
         <template v-if="isGameRunning">
           <div id="status-row">
@@ -37,18 +53,34 @@
             ></div>
           </div>
           <div id="answer">
-            <span>{{ answer }}</span>
+            <span>{{ answer ?? "" }}</span>
           </div>
           <div id="keyboard" class="keyboard">
             <div class="keyboard-row">
-              <button v-for="n in [0,1,2,3,4]" :key="n" @click="handleKeyboardButton(n)">{{ n }}</button>
+              <button
+                v-for="n in [0, 1, 2, 3, 4]"
+                :key="n"
+                @click="handleKeyboardButton(n)"
+              >
+                {{ n }}
+              </button>
             </div>
             <div class="keyboard-row">
-              <button v-for="n in [5,6,7,8,9]" :key="n" @click="handleKeyboardButton(n)">{{ n }}</button>
+              <button
+                v-for="n in [5, 6, 7, 8, 9]"
+                :key="n"
+                @click="handleKeyboardButton(n)"
+              >
+                {{ n }}
+              </button>
             </div>
             <div class="keyboard-row">
-              <button class="btn-backspace" @click="handleKeyboardButton('⌫')">⌫</button>
-              <button class="btn-enter" @click="handleKeyboardButton('↩')">↩</button>
+              <button class="btn-backspace" @click="handleKeyboardButton('⌫')">
+                ⌫
+              </button>
+              <button class="btn-enter" @click="handleKeyboardButton('↩')">
+                ↩
+              </button>
             </div>
           </div>
         </template>

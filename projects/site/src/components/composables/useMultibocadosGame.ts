@@ -6,7 +6,7 @@ export function useMultibocadosGame(level = 10) {
   const score = ref(0);
   const width = ref(1);
   const height = ref(1);
-  const answer = ref(0);
+  const answer = ref<number | null>(null);
   const showInteractionHint = ref(false);
   const showError = ref(false);
   const gridSquares = ref<string[]>([]);
@@ -103,6 +103,10 @@ export function useMultibocadosGame(level = 10) {
 
     if (value === "⌫") {
       answer.value = Math.floor(answer.value / 10);
+      // After clearing the last digit we should show no digits, not 0
+      if (answer.value == 0) {
+        answer.value = null;
+      }
       return;
     }
     if (value === "↩") {
@@ -121,7 +125,14 @@ export function useMultibocadosGame(level = 10) {
     } else {
       showError.value = true;
     }
-    answer.value = 0;
+    answer.value = null;
+  }
+
+  function onKeyDown(event: KeyboardEvent) {
+    if (event.key === "Backspace") {
+      // We don't want the browser to leave the game on this event.
+      event.preventDefault();
+    }    
   }
 
   function onKeyUp(event: KeyboardEvent) {
@@ -153,6 +164,7 @@ export function useMultibocadosGame(level = 10) {
     gameFieldClasses,
     start,
     handleKeyboardButton,
+    onKeyDown,
     onKeyUp,
   };
 }
