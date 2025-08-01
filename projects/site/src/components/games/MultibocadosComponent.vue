@@ -146,7 +146,7 @@ input {
   gap: 16px;
   align-items: stretch;
   justify-content: stretch;
-  aspect-ratio: 9/16;
+  aspect-ratio: 9/18;
   padding: 16px;
   background: #333;
   border: 8px #222 solid;
@@ -186,15 +186,16 @@ input {
 
 #status-row {
   flex: 1;
+  max-height: 6vh;
   display: flex;
   flex-direction: row;
-  align-items: start;
+  align-items: center;
   justify-content: space-between;
   container-type: size;
 }
 
 #factors {
-  font-size: 80cqh;
+  font-size: 50cqh;
   line-height: 1;
 }
 
@@ -240,7 +241,7 @@ input {
 .keyboard button {
   background: #444;
   color: white;
-  font-size: 2rem;
+  font-size: 1.5rem;
   padding: 0.5rem;
   border-radius: 8px;
 }
