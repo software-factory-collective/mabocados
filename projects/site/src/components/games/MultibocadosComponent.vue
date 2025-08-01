@@ -195,6 +195,7 @@ input {
 #timer-indicator {
   height: 4px;
   border-radius: 4px;
+  transition: width 0.01s linear;
 }
 
 #status-row {

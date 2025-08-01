@@ -86,12 +86,12 @@ export function useMultibocadosGame(level = 10) {
   function startProblemTimer() {
     clearInterval(countDownInterval);
     countDownInterval = setInterval(() => {
-      problemRemainingSeconds.value -= 1;
+      problemRemainingSeconds.value -= 0.01;
       if (problemRemainingSeconds.value <= 0) {
         showError.value = true;
         clearInterval(countDownInterval);
       }
-    }, 1000);
+    }, 10);
   }
 
   function handleKeyboardButton(value: number | string) {
