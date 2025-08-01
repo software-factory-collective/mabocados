@@ -22,7 +22,6 @@ export function useMultibocadosGame(level = 10) {
 
   function start() {
     isStarted.value = true;
-    timeLeft.value = 60;
     score.value = 0;
     width.value = 1;
     height.value = 1;
@@ -80,6 +79,11 @@ export function useMultibocadosGame(level = 10) {
   }
 
   function nextProblem() {
+    // The user will have 10 seconds for each of the first ten problems,
+    // 9 seconds for each of the next ten problems,
+    // 8 seconds for each of the next ten problems, and so on,
+    // until then have 1 second for each problem at score 90 and beyond.
+    timeLeft.value = Math.max(10 - Math.floor(score.value / 10), 1);
     height.value = generateFactor(height.value, 0, level);
     width.value = generateFactor(width.value, 0, level);
     const options = ["b", "g", "r"];
@@ -131,11 +135,7 @@ export function useMultibocadosGame(level = 10) {
       } else if (event.key === "Enter") {
         handleKeyboardButton("↩");
       }
-    } else {
-      const startKeys = [" ", "s", "Enter"];
-      if (startKeys.includes(event.key)) start();
-    }
-  }
+    }  }
 
   return {
     isStarted,
