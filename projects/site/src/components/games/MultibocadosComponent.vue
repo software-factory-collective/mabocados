@@ -30,10 +30,15 @@ const {
     >
       <div id="game-field" :class="gameFieldClasses">
         <template v-if="isStarted">
+          <div
+            v-if="!showError"
+            id="timer-indicator"
+            :style="{
+              width: `${(problemRemainingSeconds / problemTotalSeconds) * 100}%`,
+              backgroundColor: problemRemainingSeconds < 2 ? 'red' : 'green',
+            }"
+          ></div>
           <div id="status-row">
-            <div class="number-box">
-              ⏱ {{ problemRemainingSeconds.toString().padStart(2, "0") }}
-            </div>
             <div>
               <span id="factors">{{ width }} × {{ height }}</span>
             </div>
@@ -187,6 +192,11 @@ input {
   }
 }
 
+#timer-indicator {
+  height: 4px;
+  border-radius: 4px;
+}
+
 #status-row {
   flex: 1;
   max-height: 6vh;
@@ -198,7 +208,7 @@ input {
 }
 
 #factors {
-  font-size: 50cqh;
+  font-size: 100cqh;
   line-height: 1;
 }
 
