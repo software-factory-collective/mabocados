@@ -4,11 +4,11 @@ const { level = 10 } = defineProps<{ level?: number }>();
 
 const {
   isStarted,
-  isGameRunning,
   gridSquares,
   width,
   height,
-  timeLeft,
+  problemTotalSeconds,
+  problemRemainingSeconds,
   score,
   answer,
   showError,
@@ -29,11 +29,16 @@ const {
       @keyup="onKeyUp"
     >
       <div id="game-field" :class="gameFieldClasses">
-        <template v-if="isGameRunning">
+        <template v-if="isStarted">
+          <div
+            v-if="!showError"
+            id="timer-indicator"
+            :style="{
+              width: `${(problemRemainingSeconds / problemTotalSeconds) * 100}%`,
+              backgroundColor: problemRemainingSeconds <= 2 ? 'red' : 'green',
+            }"
+          ></div>
           <div id="status-row">
-            <div class="number-box">
-              ⏱ {{ timeLeft.toString().padStart(2, "0") }}
-            </div>
             <div>
               <span id="factors">{{ width }} × {{ height }}</span>
             </div>
@@ -52,10 +57,17 @@ const {
               :class="'sq ' + square"
             ></div>
           </div>
-          <div id="answer">
-            <span>{{ answer ?? "" }}</span>
+          <div id="answer-row">
+            <div id="answer">
+              <span v-if="showError" class="answer-emoji">⛔</span>
+              <span>{{ answer ?? "" }}</span>
+            </div>
+            <div v-if="showError" id="correct-answer">
+              <span class="answer-emoji">✅</span>
+              <span>{{ width * height }}</span>
+            </div>
           </div>
-          <div id="keyboard" class="keyboard">
+          <div v-if="!showError" id="keyboard" class="keyboard">
             <div class="keyboard-row">
               <button
                 v-for="n in [0, 1, 2, 3, 4]"
@@ -83,20 +95,17 @@ const {
               </button>
             </div>
           </div>
+          <div v-if="showError" class="large-button-container">
+            <button type="button" @click="start()" autofocus>🔄</button>
+          </div>
         </template>
-        <template v-else-if="!isStarted">
+        <template v-else>
           <div class="large-box">
             <span class="huge-text">×</span>
             <span class="level-number">{{ level }}</span>
           </div>
-          <div>
+          <div class="large-button-container">
             <button type="button" @click="start()" autofocus>▶️</button>
-          </div>
-        </template>
-        <template v-else>
-          <div class="large-box">🥑 {{ score }}</div>
-          <div>
-            <button type="button" @click="start()" autofocus>🔄</button>
           </div>
         </template>
       </div>
@@ -135,6 +144,7 @@ input {
   height: 100%;
   min-height: 0%;
   max-height: 100%;
+  outline: none;
 }
 
 #game-field {
@@ -153,14 +163,12 @@ input {
   border-radius: 24px;
   container-type: size;
   transition: all 50ms;
-  &.interaction-hint button {
-    animation: outline-fade 2s infinite;
-  }
+
   &.error {
     /* TODO: make this better for color blind */
     border-color: red;
     #answer {
-      background-color: red;
+      border-color: red;
     }
   }
 }
@@ -184,6 +192,12 @@ input {
   }
 }
 
+#timer-indicator {
+  height: 4px;
+  border-radius: 4px;
+  transition: width 0.01s linear;
+}
+
 #status-row {
   flex: 1;
   max-height: 6vh;
@@ -195,7 +209,7 @@ input {
 }
 
 #factors {
-  font-size: 50cqh;
+  font-size: 100cqh;
   line-height: 1;
 }
 
@@ -207,19 +221,35 @@ input {
   background: transparent;
 }
 
-#answer {
+#answer-row {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #222;
-  border-radius: 32px;
-  container-type: size;
+  gap: 12px;
 
-  > span {
+  > div {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: #222;
+    border: transparent 4px solid;
+    border-radius: 32px;
+    container-type: size;
+  }
+
+  #correct-answer {
+    border-color: green;
+  }
+
+  span {
     font-family: mono;
-    font-size: 80cqh;
+    font-size: 60cqh;
     line-height: 1;
+
+    &.answer-emoji {
+      font-size: 30cqh;
+    }
   }
 }
 
@@ -256,6 +286,24 @@ input {
   color: white;
 }
 
+.large-button-container {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & > button {
+    background: transparent;
+    outline: 5px solid transparent;
+    animation: outline-fade 2s ease-in-out infinite;
+    width: 40cqw;
+    border-radius: 25%;
+    aspect-ratio: 1;
+    margin: 0 auto;
+    font-size: 10cqh;
+  }
+}
+
 .large-box {
   aspect-ratio: 1;
   display: flex;
@@ -267,29 +315,11 @@ input {
   line-height: 1;
 
   & > .huge-text {
-    font-size: 50cqh;
+    font-size: 30cqh;
   }
 
   & > .level-number {
     font-size: 20cqh;
-  }
-
-  & + div {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    & > button {
-      background: transparent;
-      outline: 5px solid transparent;
-      animation: outline-fade 2s ease-in-out infinite;
-      width: 40cqw;
-      border-radius: 25%;
-      aspect-ratio: 1;
-      margin: 0 auto;
-      font-size: 10cqh;
-    }
   }
 }
 

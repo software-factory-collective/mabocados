@@ -2,44 +2,29 @@ import { ref, computed } from "vue";
 
 export function useMultibocadosGame(level = 10) {
   const isStarted = ref(false);
-  const timeLeft = ref(0);
+  const problemTotalSeconds = ref(10);
+  const problemRemainingSeconds = ref(10);
   const score = ref(0);
   const width = ref(1);
   const height = ref(1);
   const answer = ref<number | null>(null);
-  const showInteractionHint = ref(false);
   const showError = ref(false);
   const gridSquares = ref<string[]>([]);
   let countDownInterval: number;
-  let interactionTimeout: number;
 
-  const isGameRunning = computed(() => isStarted.value && timeLeft.value > 0);
   const correctAnswer = computed(() => width.value * height.value);
 
   const gameFieldClasses = computed(() => {
-    return [
-      showInteractionHint.value ? "interaction-hint" : "",
-      showError.value && isGameRunning.value ? "error" : "",
-    ].join(" ");
+    return [showError.value ? "error" : ""].join(" ");
   });
 
   function start() {
     isStarted.value = true;
-    timeLeft.value = 60;
     score.value = 0;
     width.value = 1;
     height.value = 1;
     gridSquares.value = [];
     showError.value = false;
-
-    clearInterval(countDownInterval);
-    countDownInterval = setInterval(() => {
-      timeLeft.value -= 1;
-      if (timeLeft.value <= 0) {
-        clearInterval(countDownInterval);
-        clearTimeout(interactionTimeout);
-      }
-    }, 1000);
     nextProblem();
   }
 
@@ -75,8 +60,7 @@ export function useMultibocadosGame(level = 10) {
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
         const index =
-          (Math.floor(x / xFactor) + Math.floor(y / yFactor)) %
-          options.length;
+          (Math.floor(x / xFactor) + Math.floor(y / yFactor)) % options.length;
         grid[y * width + x] = options[index];
       }
     }
@@ -84,23 +68,33 @@ export function useMultibocadosGame(level = 10) {
   }
 
   function nextProblem() {
+    answer.value = null;
     height.value = generateFactor(height.value, 0, level);
     width.value = generateFactor(width.value, 0, level);
     const options = ["b", "g", "r"];
     shuffle(options);
     gridSquares.value = generateGrid(width.value, height.value, options);
+    // The user will have 10 seconds for each of the first five problems,
+    // 9 seconds for each of the next five problems,
+    // 8 seconds for each of the next five problems, and so on,
+    // until they have 2 seconds for each problem at score 40 and beyond.
+    problemTotalSeconds.value = Math.max(10 - Math.floor(score.value / 5), 2);
+    problemRemainingSeconds.value = problemTotalSeconds.value;
+    startProblemTimer();
+  }
 
-    clearTimeout(interactionTimeout);
-    showInteractionHint.value = false;
-    interactionTimeout = setTimeout(() => {
-      showInteractionHint.value = true;
-    }, 10000);
+  function startProblemTimer() {
+    clearInterval(countDownInterval);
+    countDownInterval = setInterval(() => {
+      problemRemainingSeconds.value -= 0.01;
+      if (problemRemainingSeconds.value <= 0) {
+        showError.value = true;
+        clearInterval(countDownInterval);
+      }
+    }, 10);
   }
 
   function handleKeyboardButton(value: number | string) {
-    clearTimeout(interactionTimeout);
-    showInteractionHint.value = false;
-
     if (value === "⌫") {
       answer.value = Math.floor((answer.value ?? 0) / 10);
       // After clearing the last digit we should show no digits, not 0
@@ -124,19 +118,19 @@ export function useMultibocadosGame(level = 10) {
       nextProblem();
     } else {
       showError.value = true;
+      clearInterval(countDownInterval);
     }
-    answer.value = null;
   }
 
   function onKeyDown(event: KeyboardEvent) {
     if (event.key === "Backspace") {
       // We don't want the browser to leave the game on this event.
       event.preventDefault();
-    }    
+    }
   }
 
   function onKeyUp(event: KeyboardEvent) {
-    if (isGameRunning.value) {
+    if (isStarted.value && !showError.value) {
       if ("0123456789".includes(event.key)) {
         handleKeyboardButton(+event.key);
       } else if (event.key === "Backspace") {
@@ -144,23 +138,19 @@ export function useMultibocadosGame(level = 10) {
       } else if (event.key === "Enter") {
         handleKeyboardButton("↩");
       }
-    } else {
-      const startKeys = [" ", "s", "Enter"];
-      if (startKeys.includes(event.key)) start();
     }
   }
 
   return {
     isStarted,
-    timeLeft,
+    problemTotalSeconds,
+    problemRemainingSeconds,
     score,
     width,
     height,
     answer,
-    showInteractionHint,
     showError,
     gridSquares,
-    isGameRunning,
     gameFieldClasses,
     start,
     handleKeyboardButton,
