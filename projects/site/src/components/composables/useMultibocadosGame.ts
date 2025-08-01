@@ -7,18 +7,15 @@ export function useMultibocadosGame(level = 10) {
   const width = ref(1);
   const height = ref(1);
   const answer = ref<number | null>(null);
-  const showInteractionHint = ref(false);
   const showError = ref(false);
   const gridSquares = ref<string[]>([]);
   let countDownInterval: number;
-  let interactionTimeout: number;
 
   const isGameRunning = computed(() => isStarted.value && timeLeft.value > 0);
   const correctAnswer = computed(() => width.value * height.value);
 
   const gameFieldClasses = computed(() => {
     return [
-      showInteractionHint.value ? "interaction-hint" : "",
       showError.value && isGameRunning.value ? "error" : "",
     ].join(" ");
   });
@@ -37,7 +34,6 @@ export function useMultibocadosGame(level = 10) {
       timeLeft.value -= 1;
       if (timeLeft.value <= 0) {
         clearInterval(countDownInterval);
-        clearTimeout(interactionTimeout);
       }
     }, 1000);
     nextProblem();
@@ -89,18 +85,9 @@ export function useMultibocadosGame(level = 10) {
     const options = ["b", "g", "r"];
     shuffle(options);
     gridSquares.value = generateGrid(width.value, height.value, options);
-
-    clearTimeout(interactionTimeout);
-    showInteractionHint.value = false;
-    interactionTimeout = setTimeout(() => {
-      showInteractionHint.value = true;
-    }, 10000);
   }
 
   function handleKeyboardButton(value: number | string) {
-    clearTimeout(interactionTimeout);
-    showInteractionHint.value = false;
-
     if (value === "⌫") {
       answer.value = Math.floor((answer.value ?? 0) / 10);
       // After clearing the last digit we should show no digits, not 0
@@ -157,7 +144,6 @@ export function useMultibocadosGame(level = 10) {
     width,
     height,
     answer,
-    showInteractionHint,
     showError,
     gridSquares,
     isGameRunning,

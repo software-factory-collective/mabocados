@@ -153,9 +153,7 @@ input {
   border-radius: 24px;
   container-type: size;
   transition: all 50ms;
-  &.interaction-hint button {
-    animation: outline-fade 2s infinite;
-  }
+
   &.error {
     /* TODO: make this better for color blind */
     border-color: red;
