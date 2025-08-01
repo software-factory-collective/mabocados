@@ -314,7 +314,7 @@ input {
   line-height: 1;
 
   & > .huge-text {
-    font-size: 50cqh;
+    font-size: 30cqh;
   }
 
   & > .level-number {
