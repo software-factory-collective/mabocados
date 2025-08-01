@@ -8,7 +8,8 @@ const {
   gridSquares,
   width,
   height,
-  timeLeft,
+  problemTotalSeconds,
+  problemRemainingSeconds,
   score,
   answer,
   showError,
@@ -32,7 +33,7 @@ const {
         <template v-if="isGameRunning">
           <div id="status-row">
             <div class="number-box">
-              ⏱ {{ timeLeft.toString().padStart(2, "0") }}
+              ⏱ {{ problemRemainingSeconds.toString().padStart(2, "0") }}
             </div>
             <div>
               <span id="factors">{{ width }} × {{ height }}</span>

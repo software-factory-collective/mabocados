@@ -2,7 +2,8 @@ import { ref, computed } from "vue";
 
 export function useMultibocadosGame(level = 10) {
   const isStarted = ref(false);
-  const timeLeft = ref(0);
+  const problemTotalSeconds = ref(10);
+  const problemRemainingSeconds = ref(10);
   const score = ref(0);
   const width = ref(1);
   const height = ref(1);
@@ -11,7 +12,9 @@ export function useMultibocadosGame(level = 10) {
   const gridSquares = ref<string[]>([]);
   let countDownInterval: number;
 
-  const isGameRunning = computed(() => isStarted.value && timeLeft.value > 0);
+  const isGameRunning = computed(
+    () => isStarted.value && problemRemainingSeconds.value > 0,
+  );
   const correctAnswer = computed(() => width.value * height.value);
 
   const gameFieldClasses = computed(() => {
@@ -25,14 +28,6 @@ export function useMultibocadosGame(level = 10) {
     height.value = 1;
     gridSquares.value = [];
     showError.value = false;
-
-    clearInterval(countDownInterval);
-    countDownInterval = setInterval(() => {
-      timeLeft.value -= 1;
-      if (timeLeft.value <= 0) {
-        clearInterval(countDownInterval);
-      }
-    }, 1000);
     nextProblem();
   }
 
@@ -76,16 +71,28 @@ export function useMultibocadosGame(level = 10) {
   }
 
   function nextProblem() {
-    // The user will have 10 seconds for each of the first ten problems,
-    // 9 seconds for each of the next ten problems,
-    // 8 seconds for each of the next ten problems, and so on,
-    // until then have 1 second for each problem at score 90 and beyond.
-    timeLeft.value = Math.max(10 - Math.floor(score.value / 10), 1);
     height.value = generateFactor(height.value, 0, level);
     width.value = generateFactor(width.value, 0, level);
     const options = ["b", "g", "r"];
     shuffle(options);
     gridSquares.value = generateGrid(width.value, height.value, options);
+    // The user will have 10 seconds for each of the first ten problems,
+    // 9 seconds for each of the next ten problems,
+    // 8 seconds for each of the next ten problems, and so on,
+    // until then have 1 second for each problem at score 90 and beyond.
+    problemTotalSeconds.value = Math.max(10 - Math.floor(score.value / 10), 1);
+    problemRemainingSeconds.value = problemTotalSeconds.value;
+    startProblemTimer();
+  }
+
+  function startProblemTimer() {
+    clearInterval(countDownInterval);
+    countDownInterval = setInterval(() => {
+      problemRemainingSeconds.value -= 1;
+      if (problemRemainingSeconds.value <= 0) {
+        clearInterval(countDownInterval);
+      }
+    }, 1000);
   }
 
   function handleKeyboardButton(value: number | string) {
@@ -137,7 +144,8 @@ export function useMultibocadosGame(level = 10) {
 
   return {
     isStarted,
-    timeLeft,
+    problemTotalSeconds,
+    problemRemainingSeconds,
     score,
     width,
     height,
