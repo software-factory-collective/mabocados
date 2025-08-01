@@ -15,9 +15,7 @@ export function useMultibocadosGame(level = 10) {
   const correctAnswer = computed(() => width.value * height.value);
 
   const gameFieldClasses = computed(() => {
-    return [
-      showError.value && isGameRunning.value ? "error" : "",
-    ].join(" ");
+    return [showError.value && isGameRunning.value ? "error" : ""].join(" ");
   });
 
   function start() {
@@ -70,8 +68,7 @@ export function useMultibocadosGame(level = 10) {
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
         const index =
-          (Math.floor(x / xFactor) + Math.floor(y / yFactor)) %
-          options.length;
+          (Math.floor(x / xFactor) + Math.floor(y / yFactor)) % options.length;
         grid[y * width + x] = options[index];
       }
     }
@@ -123,7 +120,7 @@ export function useMultibocadosGame(level = 10) {
     if (event.key === "Backspace") {
       // We don't want the browser to leave the game on this event.
       event.preventDefault();
-    }    
+    }
   }
 
   function onKeyUp(event: KeyboardEvent) {
@@ -135,7 +132,8 @@ export function useMultibocadosGame(level = 10) {
       } else if (event.key === "Enter") {
         handleKeyboardButton("↩");
       }
-    }  }
+    }
+  }
 
   return {
     isStarted,
