@@ -1,97 +1,86 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
+import Layout from "../layouts/Layout.astro";
+import Card from "../components/Card.astro";
 ---
 
 <Layout title="Welcome to Mabocados">
-	<main>
-		<h1>Welcome to <span class="text-gradient">Mabocados</span></h1>
-		<p class="tagline">
-		A daily boost for your brain.
-		</p>
-		<!-- TODO: LARGE LOGO HERE -->
-		<p class="instructions">
-		Mabocados is a work in progress. The demo has some rough edges!
-		</p>
-		<ul role="list" class="link-card-grid">
-			<Card
-				href="/demo"
-				title="Demo"
-				body="Try it out!"
-			/>
-			<Card
-				href="/about"
-				title="About"
-				body="Learn more about the project"
-			/>
-			<Card
-				href="/roadmap"
-				title="Roadmap"
-				body="See what's coming up"
-			/>
-			<Card
-				href="https://github.com/software-factory-collective/mabocados"
-				title="Code"
-				body="View the code on GitHub"
-			/>
-			<!-- TODO: add this card once we have some sort of community server set up -->
-			<!-- <Card -->
-				<!-- href="" -->
-				<!-- title="Community" -->
-				<!-- body="Reach out on our Matrix server - Coming Soon!" -->
-			<!-- /> -->
-		</ul>
-	</main>
+  <main>
+    <h1>Welcome to <span class="text-gradient">Mabocados</span></h1>
+    <p class="tagline">A daily boost for your brain.</p>
+    <!-- TODO: LARGE LOGO HERE -->
+    <p class="instructions">
+      Mabocados is a work in progress. The demo has some rough edges!
+    </p>
+    <ul role="list" class="link-card-grid">
+      <Card href="/demo" title="Demo" body="Try it out!" />
+      <Card href="/about" title="About" body="Learn more about the project" />
+      <Card href="/roadmap" title="Roadmap" body="See what's coming up" />
+      <Card
+        href="https://github.com/software-factory-collective/mabocados"
+        title="Code"
+        body="View the code on GitHub"
+      />
+      <!-- TODO: add this card once we have some sort of community server set up -->
+      <!-- <Card -->
+      <!-- href="" -->
+      <!-- title="Community" -->
+      <!-- body="Reach out on our Matrix server - Coming Soon!" -->
+      <!-- /> -->
+    </ul>
+  </main>
 </Layout>
 
 <style>
-	main {
-		padding: 0 1rem;
-		color: white;
-		font-size: 20px;
-		line-height: 1.6;
-	}
-	h1 {
-		font-size: 4rem;
-		font-weight: 700;
-		line-height: 1;
-		text-align: center;
-		margin-bottom: 0.5em;
-	}
-	.text-gradient {
-		background-image: var(--accent-gradient);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-size: 400%;
-		background-position: 0%;
-	}
-	.tagline {
-		margin-bottom: 3rem;
-		font-style: italic;
-		text-align: center;
-	}
-	.instructions {
-		margin-bottom: 2rem;
-		border: 1px solid oklch(var(--accent-light) / 25%);
-		background: linear-gradient(oklch(var(--accent-dark) / 66%), oklch(var(--accent-dark) / 33%));
-		padding: 1.5rem;
-		border-radius: 8px;
-	}
-	.instructions code {
-		font-size: 0.8em;
-		font-weight: bold;
-		background: oklch(var(--accent-light) / 12%);
-		color: oklch(var(--accent-light));
-		border-radius: 4px;
-		padding: 0.3em 0.4em;
-	}
-	.instructions strong {
-		color: oklch(var(--accent-light));
-	}
-	.link-card-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
-		gap: 2rem;
-		padding: 0;
-	}
+  main {
+    padding: 2rem;
+    color: white;
+    font-size: 20px;
+    line-height: 1.6;
+  }
+  h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    margin-bottom: 0.5em;
+  }
+  .text-gradient {
+    background-image: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 400%;
+    background-position: 0%;
+  }
+  .tagline {
+    margin-bottom: 3rem;
+    font-style: italic;
+    text-align: center;
+  }
+  .instructions {
+    margin-bottom: 2rem;
+    border: 1px solid oklch(var(--accent-light) / 25%);
+    background: linear-gradient(
+      oklch(var(--accent-dark) / 66%),
+      oklch(var(--accent-dark) / 33%)
+    );
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+  .instructions code {
+    font-size: 0.8em;
+    font-weight: bold;
+    background: oklch(var(--accent-light) / 12%);
+    color: oklch(var(--accent-light));
+    border-radius: 4px;
+    padding: 0.3em 0.4em;
+  }
+  .instructions strong {
+    color: oklch(var(--accent-light));
+  }
+  .link-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
+    gap: 2rem;
+    padding: 0;
+  }
 </style>
