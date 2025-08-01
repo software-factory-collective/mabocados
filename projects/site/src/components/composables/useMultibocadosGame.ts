@@ -74,11 +74,11 @@ export function useMultibocadosGame(level = 10) {
     const options = ["b", "g", "r"];
     shuffle(options);
     gridSquares.value = generateGrid(width.value, height.value, options);
-    // The user will have 10 seconds for each of the first ten problems,
-    // 9 seconds for each of the next ten problems,
-    // 8 seconds for each of the next ten problems, and so on,
-    // until then have 1 second for each problem at score 90 and beyond.
-    problemTotalSeconds.value = Math.max(10 - Math.floor(score.value / 10), 1);
+    // The user will have 10 seconds for each of the first five problems,
+    // 9 seconds for each of the next five problems,
+    // 8 seconds for each of the next five problems, and so on,
+    // until they have 2 seconds for each problem at score 40 and beyond.
+    problemTotalSeconds.value = Math.max(10 - Math.floor(score.value / 5), 2);
     problemRemainingSeconds.value = problemTotalSeconds.value;
     startProblemTimer();
   }

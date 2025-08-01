@@ -35,7 +35,7 @@ const {
             id="timer-indicator"
             :style="{
               width: `${(problemRemainingSeconds / problemTotalSeconds) * 100}%`,
-              backgroundColor: problemRemainingSeconds < 2 ? 'red' : 'green',
+              backgroundColor: problemRemainingSeconds <= 2 ? 'red' : 'green',
             }"
           ></div>
           <div id="status-row">
