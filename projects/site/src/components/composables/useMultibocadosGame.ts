@@ -109,6 +109,10 @@ export function useMultibocadosGame(level = 10) {
     }
 
     answer.value = (answer.value ?? 0) * 10 + (value as number);
+    // Auto-submit if the user has the correct answer.
+    if (answer.value == correctAnswer.value) {
+      checkAnswer();
+    }
   }
 
   function checkAnswer() {
