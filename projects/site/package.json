@@ -13,8 +13,8 @@
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/tailwind": "^5.1.2",
-    "@astrojs/vue": "^4.5.2",
-    "astro": "^4.16.18",
+    "@astrojs/vue": "^5.1.1",
+    "astro": "^5.14.6",
     "prettier": "^3.6.2",
     "prettier-plugin-astro": "^0.14.1",
     "tailwindcss": "^3.4.14",
