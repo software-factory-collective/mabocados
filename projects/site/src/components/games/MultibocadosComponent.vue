@@ -39,7 +39,7 @@ const {
               backgroundColor: problemRemainingSeconds <= 2 ? 'red' : 'green',
             }"
           ></div>
-          <div id="status-row">
+          <div v-if="!isGameOver" id="status-row">
             <div>
               <span id="factors">{{ width }} × {{ height }}</span>
             </div>
@@ -48,6 +48,7 @@ const {
             </div>
           </div>
           <div
+            v-if="!isGameOver"
             id="grid"
             class="large-box"
             :style="{ gridTemplateColumns: 'repeat(' + width + ', 1fr)' }"
@@ -93,7 +94,6 @@ const {
           </div>
           <div v-if="isGameOver" class="game-over-screen">
             <div class="score-display">
-              <div class="score-label">Final Score</div>
               <div class="score-value">🥑 {{ score.toString().padStart(2, "0") }}</div>
             </div>
             <div class="game-over-button-container">
@@ -103,7 +103,7 @@ const {
                 autofocus
                 class="game-over-button"
               >
-                {{ canAdvanceToNextLevel ? 'Next Level ➡️' : 'Restart 🔄' }}
+                {{ canAdvanceToNextLevel ? '➡️' : '🔄' }}
               </button>
             </div>
           </div>
@@ -230,37 +230,7 @@ input {
   background: transparent;
 }
 
-#answer-row {
-  flex: 1;
-  display: flex;
-  gap: 12px;
 
-  > div {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: #222;
-    border: transparent 4px solid;
-    border-radius: 32px;
-    container-type: size;
-  }
-
-  #correct-answer {
-    border-color: green;
-  }
-
-  span {
-    font-family: mono;
-    font-size: 60cqh;
-    line-height: 1;
-
-    &.answer-emoji {
-      font-size: 30cqh;
-    }
-  }
-}
 
 .keyboard {
   display: grid;
@@ -295,13 +265,37 @@ input {
   color: white;
 }
 
+#answer-row {
+  flex: 1;
+  display: flex;
+
+  > div {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: #222;
+    border: transparent 4px solid;
+    border-radius: 32px;
+    container-type: size;
+  }
+
+  span {
+    font-family: mono;
+    font-size: 60cqh;
+    line-height: 1;
+  }
+}
+
 .game-over-screen {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 24px;
+  padding-top: 60px;
 }
 
 .score-display {
@@ -311,12 +305,7 @@ input {
   gap: 8px;
 }
 
-.score-label {
-  font-size: 4cqh;
-  color: #aaa;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
+
 
 .score-value {
   font-size: 12cqh;
