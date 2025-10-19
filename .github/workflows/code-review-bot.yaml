@@ -9,11 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mrs-electronics-inc/bots/code-review:latest
-      volumes:
-        - ${{ github.workspace }}:/repo
-    defaults:
-      run:
-        working-directory: /repo
     permissions:
       pull-requests: write
     steps:
@@ -23,4 +18,5 @@ jobs:
         env:
           OPENROUTER_KEY: ${{ secrets.API_KEY_CODE_REVIEW_BOT }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
         run: github_code_review.sh

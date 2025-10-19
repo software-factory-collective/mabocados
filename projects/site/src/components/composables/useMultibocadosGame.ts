@@ -10,7 +10,7 @@ export function useMultibocadosGame(level = 10) {
   const answer = ref<number | null>(null);
   const showError = ref(false);
   const gridSquares = ref<string[]>([]);
-  let countDownInterval: number;
+  let countDownInterval: ReturnType<typeof setInterval>;
 
   const correctAnswer = computed(() => width.value * height.value);
 
