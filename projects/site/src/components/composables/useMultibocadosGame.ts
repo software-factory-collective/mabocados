@@ -34,6 +34,8 @@ export function useMultibocadosGame(level = 10) {
     nextProblem();
   }
 
+
+
   function generateFactor(oldValue: number, min: number, max: number) {
     const options = [];
     for (let option = min; option <= max; option++) {

@@ -2,6 +2,11 @@
 import { useMultibocadosGame } from "../composables/useMultibocadosGame";
 const { level = 10 } = defineProps<{ level?: number }>();
 
+function goToNextLevel() {
+  const nextLevel = level + 1;
+  window.location.href = `/demo/multibocados/${nextLevel}`;
+}
+
 const {
   isStarted,
   gridSquares,
@@ -99,7 +104,7 @@ const {
             <div class="game-over-button-container">
               <button 
                 type="button" 
-                @click="start()" 
+                @click="canAdvanceToNextLevel ? goToNextLevel() : start()" 
                 autofocus
                 class="game-over-button"
               >
