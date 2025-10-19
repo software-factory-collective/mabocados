@@ -2,6 +2,11 @@
 import { useMultibocadosGame } from "../composables/useMultibocadosGame";
 const { level = 10 } = defineProps<{ level?: number }>();
 
+function goToNextLevel() {
+  const nextLevel = level + 1;
+  window.location.href = `/demo/multibocados/${nextLevel}`;
+}
+
 const {
   isStarted,
   gridSquares,
@@ -11,8 +16,9 @@ const {
   problemRemainingSeconds,
   score,
   answer,
-  showError,
+  isGameOver,
   gameFieldClasses,
+  canAdvanceToNextLevel,
   start,
   handleKeyboardButton,
   onKeyDown,
@@ -31,14 +37,14 @@ const {
       <div id="game-field" :class="gameFieldClasses">
         <template v-if="isStarted">
           <div
-            v-if="!showError"
+            v-if="!isGameOver"
             id="timer-indicator"
             :style="{
               width: `${(problemRemainingSeconds / problemTotalSeconds) * 100}%`,
               backgroundColor: problemRemainingSeconds <= 2 ? 'red' : 'green',
             }"
           ></div>
-          <div id="status-row">
+          <div v-if="!isGameOver" id="status-row">
             <div>
               <span id="factors">{{ width }} × {{ height }}</span>
             </div>
@@ -47,6 +53,7 @@ const {
             </div>
           </div>
           <div
+            v-if="!isGameOver"
             id="grid"
             class="large-box"
             :style="{ gridTemplateColumns: 'repeat(' + width + ', 1fr)' }"
@@ -57,17 +64,12 @@ const {
               :class="'sq ' + square"
             ></div>
           </div>
-          <div id="answer-row">
+          <div v-if="!isGameOver" id="answer-row">
             <div id="answer">
-              <span v-if="showError" class="answer-emoji">⛔</span>
               <span>{{ answer ?? "" }}</span>
             </div>
-            <div v-if="showError" id="correct-answer">
-              <span class="answer-emoji">✅</span>
-              <span>{{ width * height }}</span>
-            </div>
           </div>
-          <div v-if="!showError" id="keyboard" class="keyboard">
+          <div v-if="!isGameOver" id="keyboard" class="keyboard">
             <div class="keyboard-row">
               <button
                 v-for="n in [0, 1, 2, 3, 4]"
@@ -95,8 +97,20 @@ const {
               </button>
             </div>
           </div>
-          <div v-if="showError" class="large-button-container">
-            <button type="button" @click="start()" autofocus>🔄</button>
+          <div v-if="isGameOver" class="game-over-screen">
+            <div class="score-display">
+              <div class="score-value">🥑 {{ score.toString().padStart(2, "0") }}</div>
+            </div>
+            <div class="game-over-button-container">
+              <button 
+                type="button" 
+                @click="canAdvanceToNextLevel ? goToNextLevel() : start()" 
+                autofocus
+                class="game-over-button"
+              >
+                {{ canAdvanceToNextLevel ? '➡️' : '🔄' }}
+              </button>
+            </div>
           </div>
         </template>
         <template v-else>
@@ -221,37 +235,7 @@ input {
   background: transparent;
 }
 
-#answer-row {
-  flex: 1;
-  display: flex;
-  gap: 12px;
 
-  > div {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: #222;
-    border: transparent 4px solid;
-    border-radius: 32px;
-    container-type: size;
-  }
-
-  #correct-answer {
-    border-color: green;
-  }
-
-  span {
-    font-family: mono;
-    font-size: 60cqh;
-    line-height: 1;
-
-    &.answer-emoji {
-      font-size: 30cqh;
-    }
-  }
-}
 
 .keyboard {
   display: grid;
@@ -284,6 +268,80 @@ input {
 .keyboard .btn-enter {
   background: green;
   color: white;
+}
+
+#answer-row {
+  flex: 1;
+  display: flex;
+
+  > div {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: #222;
+    border: transparent 4px solid;
+    border-radius: 32px;
+    container-type: size;
+  }
+
+  span {
+    font-family: mono;
+    font-size: 60cqh;
+    line-height: 1;
+  }
+}
+
+.game-over-screen {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 24px;
+  padding-top: 60px;
+}
+
+.score-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+
+
+.score-value {
+  font-size: 12cqh;
+  font-family: mono;
+  background: #444;
+  padding: 16px 32px;
+  border-radius: 16px;
+  color: #aaa;
+}
+
+.game-over-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-over-button {
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 32px;
+  font-size: 4cqh;
+  outline: 3px solid transparent;
+  animation: outline-fade 2s ease-in-out infinite;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #555;
+    transform: scale(1.05);
+  }
 }
 
 .large-button-container {

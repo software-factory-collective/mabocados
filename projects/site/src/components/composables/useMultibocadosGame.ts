@@ -1,5 +1,7 @@
 import { ref, computed } from "vue";
 
+const NEXT_LEVEL_THRESHOLD = 30;
+
 export function useMultibocadosGame(level = 10) {
   const isStarted = ref(false);
   const problemTotalSeconds = ref(10);
@@ -8,14 +10,18 @@ export function useMultibocadosGame(level = 10) {
   const width = ref(1);
   const height = ref(1);
   const answer = ref<number | null>(null);
-  const showError = ref(false);
+  const isGameOver = ref(false);
   const gridSquares = ref<string[]>([]);
   let countDownInterval: ReturnType<typeof setInterval>;
 
   const correctAnswer = computed(() => width.value * height.value);
 
   const gameFieldClasses = computed(() => {
-    return [showError.value ? "error" : ""].join(" ");
+    return [isGameOver.value ? "error" : ""].join(" ");
+  });
+
+  const canAdvanceToNextLevel = computed(() => {
+    return score.value > NEXT_LEVEL_THRESHOLD;
   });
 
   function start() {
@@ -24,9 +30,11 @@ export function useMultibocadosGame(level = 10) {
     width.value = 1;
     height.value = 1;
     gridSquares.value = [];
-    showError.value = false;
+    isGameOver.value = false;
     nextProblem();
   }
+
+
 
   function generateFactor(oldValue: number, min: number, max: number) {
     const options = [];
@@ -88,7 +96,7 @@ export function useMultibocadosGame(level = 10) {
     countDownInterval = setInterval(() => {
       problemRemainingSeconds.value -= 0.01;
       if (problemRemainingSeconds.value <= 0) {
-        showError.value = true;
+        isGameOver.value = true;
         clearInterval(countDownInterval);
       }
     }, 10);
@@ -116,12 +124,12 @@ export function useMultibocadosGame(level = 10) {
   }
 
   function checkAnswer() {
-    showError.value = false;
+    isGameOver.value = false;
     if (answer.value == correctAnswer.value) {
       score.value++;
       nextProblem();
     } else {
-      showError.value = true;
+      isGameOver.value = true;
       clearInterval(countDownInterval);
     }
   }
@@ -134,7 +142,7 @@ export function useMultibocadosGame(level = 10) {
   }
 
   function onKeyUp(event: KeyboardEvent) {
-    if (isStarted.value && !showError.value) {
+    if (isStarted.value && !isGameOver.value) {
       if ("0123456789".includes(event.key)) {
         handleKeyboardButton(+event.key);
       } else if (event.key === "Backspace") {
@@ -153,9 +161,10 @@ export function useMultibocadosGame(level = 10) {
     width,
     height,
     answer,
-    showError,
+    isGameOver,
     gridSquares,
     gameFieldClasses,
+    canAdvanceToNextLevel,
     start,
     handleKeyboardButton,
     onKeyDown,
