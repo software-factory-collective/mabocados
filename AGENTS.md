@@ -98,7 +98,7 @@ Run these from `projects/site`
 
 - **Development**: `npm run dev` (start dev server), `npm run dev:host` (dev server with network access)
 - **Build**: `npm run build` (type check + build), `npm run preview` (preview production build)
-- TODO: Add linting tool specification
+- **Lint**: `npm run lint` (type check)
 
 ### Opencode Commands
 
