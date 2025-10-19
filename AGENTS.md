@@ -2,13 +2,22 @@
 
 ## Project Knowledge
 
-TODO: add basic summary of project
+Mabocados is an application designed to exercise the mind through mini mathematical games. Its objective is to facilitate the learning of new math and logic concepts, complementing education and keeping the brain active and fit. With Mabocados, learning is dynamic and entertaining, encouraging users to strengthen their cognitive skills in a fun and continuous way.
 
 **Technology Stack:**
-TODO: add list
+- Astro (static site generator)
+- Vue 3 (components and composables)
+- TypeScript
+- Tailwind CSS (styling)
+- Prettier (code formatting)
 
 **Core Features:**
-TODO: add list
+- Multibocados multiplication game with timed challenges
+- Visual grid-based puzzles with colored squares
+- Progressive difficulty system (levels 1-20)
+- Score tracking and timer mechanics
+- Mobile-responsive design with on-screen keyboard
+- Keyboard input support
 
 ### GitHub Data Access
 
