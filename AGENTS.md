@@ -10,6 +10,7 @@ Mabocados is an application designed to exercise the mind through mini mathemati
 - TypeScript
 - Tailwind CSS (styling)
 - Prettier (code formatting)
+- TODO: Add testing framework (Vitest/Jest/etc.)
 
 **Core Features:**
 - Multibocados multiplication game with timed challenges
@@ -90,6 +91,14 @@ Mabocados is an application designed to exercise the mind through mini mathemati
 - Feature branches for issues (e.g., `63-new-setting`)
 - Use GitHub CLI for PR creation: `gh pr create`
 - Commit messages follow conventional format: `feat:`, `refactor:`, `chore:`, `fix:`, etc.
+
+### Development Commands
+
+Run these from `projects/site`
+
+- **Development**: `npm run dev` (start dev server), `npm run dev:host` (dev server with network access)
+- **Build**: `npm run build` (type check + build), `npm run preview` (preview production build)
+- TODO: Add linting tool specification
 
 ### Opencode Commands
 
