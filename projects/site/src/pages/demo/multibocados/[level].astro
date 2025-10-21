@@ -1,0 +1,15 @@
+---
+import MultibocadosComponent from '../../../components/games/MultibocadosComponent.vue';
+import Layout from '../../../layouts/Layout.astro';
+
+export function getStaticPaths() {
+  return Array(20).fill(null).map((_, index) => ({params: {level: (index + 1).toString()}}));
+}
+
+const { level } = Astro.params;
+---
+<Layout title="Multibocados">
+
+<MultibocadosComponent client:only level={+level} />
+
+</Layout>

@@ -11,7 +11,7 @@ const { title } = Astro.props;
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content="A daily boost for your brain." />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 		<link rel="icon" href="/favicon.ico" />
     <link rel="manifest" href="/app.webmanifest">
 		<meta name="generator" content={Astro.generator} />
@@ -37,6 +37,17 @@ const { title } = Astro.props;
 	html {
 		font-family: system-ui, sans-serif;
 		background: #13151a;
+		color: white;
+	}
+	html, body {
+	  position: fixed;
+	  overflow: hidden;
+	  width: 100vw;
+	  height: 100vh;
+	}
+	main {
+		height: 100vh;
+		overflow: auto;
 	}
 	code {
 		font-family:
